@@ -6,50 +6,24 @@ import 'package:elandguard/Constants/myColors.dart';
 import 'package:elandguard/Util/NetworkUtility.dart';
 import 'package:elandguard/Util/Utility.dart';
 import 'package:elandguard/Util/paths.dart';
+import 'package:elandguard/databaseTools/UserDB.dart';
 import 'package:elandguard/databaseTools/UserDBImp.dart';
+import 'package:elandguard/model/AppData.dart';
 import 'package:elandguard/model/OtpModel.dart';
 import 'package:elandguard/model/UserProfileModel.dart';
 import 'package:elandguard/userScreens/OTPScreen/OtpScreen.dart';
+import 'package:elandguard/userScreens/ResetPassword/Email.dart';
 import 'package:elandguard/userScreens/SignUpScreen/Signup.dart';
+import 'package:elandguard/userScreens/myHomePage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart';
-import 'package:toast/toast.dart';
-import 'package:elandguard/tools/app_data.dart';
-import 'package:elandguard/tools/app_methods.dart';
-import 'package:elandguard/tools/app_tools.dart';
-import 'package:elandguard/userScreens/myHomePage.dart';
-import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
+
 class LoginScreen extends StatefulWidget {
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
-
- final String posturl = "http://141.136.36.89:8080/whissla_service/rest/";
-
- Future<String> loginClientAccount(String jsonRequest) async {
-    
-    try{
-          final response = await http.post(Uri.parse(posturl+"client_account_mgt_service/select_client_account_for_login"),
-      headers: {
-        "Accept": "application/json"
-      },
-      body: jsonRequest
-    );
-print(response.statusCode) ;
-    if(response.statusCode == 200){
-    final String responseString = response.body;
-    return responseString;
-  }else{
-    return null;
-  }
-    }  catch (error) {
-      print(error) ;
-     
-    }
-
-  }
-
 
 class _LoginScreenState extends State<LoginScreen> {
   var emailController = TextEditingController();
@@ -67,28 +41,30 @@ class _LoginScreenState extends State<LoginScreen> {
       backgroundColor: kBackgroundTheme,
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.only(left: 22.0, right: 22,top: 70),
+          padding: const EdgeInsets.only(left: 22.0, right: 22, top: 70),
           child: Column(
             children: <Widget>[
               SizedBox(
                 height: 30.0,
               ),
-            Container(
-              alignment: Alignment.center,
-             child: Image.asset(
-              'assets/images/splash.png',
-              width: 240.0,
-              height: 150.0,),
-              // width: 600.0,
-              height: 200.0,
-            ),
+              Container(
+                alignment: Alignment.center,
+                child: Image.asset(
+                  'assets/images/splash.png',
+                  width: 240.0,
+                  height: 150.0,
+                ),
+                // width: 600.0,
+                height: 200.0,
+              ),
               Container(
                 height: 48,
                 margin: EdgeInsets.all(5),
                 padding: EdgeInsets.only(left: 5),
-                decoration: BoxDecoration(// set border width
+                decoration: BoxDecoration(
+                  // set border width
                   borderRadius: BorderRadius.all(
-                      Radius.circular(10.0),
+                    Radius.circular(10.0),
                   ),
                 ),
                 child: Center(
@@ -101,23 +77,30 @@ class _LoginScreenState extends State<LoginScreen> {
                     decoration: InputDecoration(
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(color: Colors.black87, width: 0.0),
+                        borderSide:
+                            const BorderSide(color: Colors.black87, width: 0.0),
                       ),
                       focusedBorder: OutlineInputBorder(
-                          borderRadius: const BorderRadius.all(
-                              Radius.circular(10)
-                          ),
-                        borderSide: const BorderSide(color: kPrimaryTheme, width: 0.7),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(10)),
+                        borderSide:
+                            const BorderSide(color: kPrimaryTheme, width: 0.7),
                       ),
-                      prefixIcon: Icon(Icons.mail, color: Colors.black54,),
+                      prefixIcon: Icon(
+                        Icons.mail,
+                        color: Colors.black54,
+                      ),
                       hintText: 'Email Address',
-                      hintStyle: TextStyle(fontSize: 17, color: Colors.black54,),
+                      hintStyle: TextStyle(
+                        fontSize: 17,
+                        color: Colors.black54,
+                      ),
                       border: InputBorder.none,
                     ),
                   ),
                 ),
               ),
-               SizedBox(
+              SizedBox(
                 height: 10.0,
               ),
               Container(
@@ -139,15 +122,19 @@ class _LoginScreenState extends State<LoginScreen> {
                     decoration: InputDecoration(
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(color: Colors.black87, width: 0.0),
+                        borderSide:
+                            const BorderSide(color: Colors.black87, width: 0.0),
                       ),
                       focusedBorder: OutlineInputBorder(
-                          borderRadius: const BorderRadius.all(
-                              Radius.circular(10)
-                          ),
-                        borderSide: const BorderSide(color: kPrimaryTheme, width: 0.7),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(10)),
+                        borderSide:
+                            const BorderSide(color: kPrimaryTheme, width: 0.7),
                       ),
-                      prefixIcon: Icon(Icons.lock, color: Colors.black54,),
+                      prefixIcon: Icon(
+                        Icons.lock,
+                        color: Colors.black54,
+                      ),
                       hintText: 'Password',
                       hintStyle: TextStyle(fontSize: 17, color: Colors.black54),
                     ),
@@ -163,34 +150,27 @@ class _LoginScreenState extends State<LoginScreen> {
                   labelColor: kPrimaryTheme,
                   label: "Login",
                   textColor: Colors.white,
-                  onTap: () async{
+                  onTap: () async {
                     // setState(() {
                     //   password = passwordController.text;
                     // });
                     bool canProceed = isValidEntries(context);
                     if (canProceed) {
-                      UserDBImplementation imp = UserDBImplementation();
-                      UserProfileModel user = await imp.authenticateAgainstLocalDB(email, password);
-                      if( (user != null && user.email == email) && (user != null && user.password == password)){
+                      bool foundLocally = await localAuthentication(context);
+                      if (foundLocally) {
                         Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    MyHomePage()));
-                      }else {
-                        new UtilityService().showMessage(
-                          context: context,
-                          message: "Invalid email or password",
-                          icon: Icon(
-                            Icons.error,
-                            color: Colors.red,
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => MyHomePage(),
                           ),
                         );
-                        //display invalid pin toast
+                      } else {
+                        UserProfileModel model = UserProfileModel(
+                          email: emailController.text,
+                          password: passwordController.text,
+                        );
+                        serverAuthentication(model);
                       }
-
-
-
                     }
                   },
                 ),
@@ -237,20 +217,21 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ],
               ),
-              SizedBox(height: 4,),
+              SizedBox(
+                height: 4,
+              ),
               GestureDetector(
-                onTap: ()async{
-                  Navigator.push(context, MaterialPageRoute(builder: (context)=>OtpScreen()),);
-                  UserDBImplementation imp = UserDBImplementation();
-                  UserProfileModel user = await imp.getUser();
-                  OTPModel otpModel = OTPModel(name: user.name,email: user.email, phone: user.phone,);
-                  createOTP(dataModel: otpModel, context: context);
+                onTap: () async {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => EmailScreen()),
+                  );
                 },
                 child: Container(
                   child: Text(
                     "Forgot pin?",
                     style: GoogleFonts.lato(
-                      color:Colors.teal,
+                      color: Colors.teal,
                       fontSize: 14,
                       fontWeight: FontWeight.w400,
                       letterSpacing: 0.4,
@@ -265,8 +246,21 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  Future<bool> localAuthentication(BuildContext context) async {
+    UserDBImplementation imp = UserDBImplementation();
+    UserProfileModel user =
+        await imp.authenticateAgainstLocalDB(email, password);
+    if ((user != null && user.email == email) &&
+        (user != null && user.password == password)) {
+      Provider.of<AppData>(context, listen: false).updateUserData(user);
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   bool isValidEntries(BuildContext context) {
-     if (emailController.text.length == 0 ||
+    if (emailController.text.length == 0 ||
         !emailController.text.contains("@") ||
         !emailController.text.contains(".")) {
       new UtilityService().showMessage(
@@ -298,12 +292,10 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       );
       return false;
-    }
-    else {
+    } else {
       return true;
     }
   }
-
 
   void createOTP({OTPModel dataModel, BuildContext context}) async {
     try {
@@ -318,7 +310,7 @@ class _LoginScreenState extends State<LoginScreen> {
       Response response = await networkUtility.postDataWithAuth(
           url: OTP_URL, body: jsonBody, auth: 'Bearer $ACCESS_TOKEN');
 
-      print('Response: ${response.body}');
+      print('Reset response: ${response.body}');
 
       Navigator.of(context, rootNavigator: true).pop();
 
@@ -384,8 +376,86 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  void saveUserDetailsLocally(UserProfileModel user) async {
+    try {
+      UserDBImplementation dbImplementation = UserDBImplementation();
+      UserDB userDB = UserDB();
 
+      await userDB.initialize();
+      await userDB.deleteAll();
 
+      await dbImplementation.saveUser(user);
+      Provider.of<AppData>(context, listen: false).updateUserData(user);
+    } catch (e) {
+      print('saving user data to local db error: $e');
+    }
+  }
+
+  void serverAuthentication(UserProfileModel userProfileModel) async {
+    try {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return ProgressDialog(displayMessage: 'Authenticating...');
+        },
+      );
+
+      var jsonBody = jsonEncode(userProfileModel);
+      NetworkUtility networkUtility = NetworkUtility();
+      Response response = await networkUtility.postDataWithAuth(
+          url: AUTH_USER_URL, body: jsonBody, auth: 'Bearer $ACCESS_TOKEN');
+
+      print('auth response: ${response.body}');
+
+      Navigator.of(context, rootNavigator: true).pop();
+      if (response == null) {
+        //error handling
+        new UtilityService().showMessage(
+          context: context,
+          message: 'An error has occurred. Please try again',
+          icon: Icon(
+            Icons.error_outline,
+            color: Colors.red,
+          ),
+        );
+      } else {
+        var data = jsonDecode(response.body);
+
+        int status = data['status'];
+        print('Status: $status');
+        // Handle network error
+        if (status == 500 || status == 404 || status == 403) {
+          new UtilityService().showMessage(
+            message: 'An error has occurred. Please try again',
+            icon: Icon(
+              Icons.error_outline,
+              color: Colors.red,
+            ),
+            context: context,
+          );
+        } else if (status == 200) {
+          UserProfileModel user = UserProfileModel(
+            name: data['data']['name'],
+            email: data['data']['email'],
+            phone: data['data']['phone'],
+            password: password,
+          );
+          saveUserDetailsLocally(user);
+        } else {
+          new UtilityService().showMessage(
+            context: context,
+            message: data['message'],
+            icon: Icon(
+              Icons.error_outline,
+              color: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      print('server auth error: $e');
+    }
+  }
 
 //
 //   verifyLogin() async {

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:elandguard/Component/ProgressDialog.dart';
 import 'package:elandguard/Component/TextButtonComponent.dart';
@@ -7,71 +8,19 @@ import 'package:elandguard/Util/NetworkUtility.dart';
 import 'package:elandguard/Util/Utility.dart';
 import 'package:elandguard/Util/paths.dart';
 import 'package:elandguard/model/OtpModel.dart';
-import 'package:elandguard/tools/progressdialog.dart';
+import 'package:elandguard/userScreens/Login/login.dart';
 import 'package:elandguard/userScreens/OTPScreen/OtpScreen.dart';
 import 'package:flutter/material.dart';
-import 'package:elandguard/tools/app_data.dart';
-import 'package:elandguard/tools/app_methods.dart';
-import 'package:elandguard/tools/app_tools.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:http/http.dart' as http;
-import 'package:elandguard/userScreens/Login/login.dart';
 import 'package:http/http.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
 
 class SignUp extends StatefulWidget {
   @override
   _SignUpState createState() => _SignUpState();
 }
-
-//
-//  final String posturl = "http://141.136.36.89:8080/swa_service/rest/";
-//
-//  Future<String> createUserAccount(String jsonRequest) async {
-//     //
-//     final queryParameters = jsonRequest;
-//
-// //final uri =Uri.https(posturl, 'client_account_mgt_service/select_tbl_client_account_add_update', queryParameters);
-//
-//     //parse
-//    // encodeFull
-//
-//   //final uri =Uri.https('www.myurl.com', '/api/v1/test/${widget.pk}', queryParameters);
-//       //var url = Uri.parse('https://example.com/whatsit/create');
-//        //var url = Uri.encodeFull(posturl+"client_account_mgt_service/select_tbl_client_account_add_update");
-//     final  response = await http.post(Uri.parse(posturl+"client_account_mgt_service/select_tbl_client_account_add_update"),
-//       headers: {
-//         "Accept": "application/json"
-//       },
-//       body: jsonRequest
-//     );
-//
-//     if(response.statusCode == 200){
-//     final String responseString = response.body;
-//     return responseString;
-//   }else{
-//     return null;
-//   }
-//
-//   }
-//
-//
-//
-// Future<String> sendSMS(String jsonRequest) async {
-//     final response = await http.post(Uri.parse(posturl+"sms_service/select_log_sms_alert"),
-//       headers: {
-//         "Accept": "application/json"
-//       },
-//       body: jsonRequest
-//     );
-//
-//     if(response.statusCode == 200){
-//     final String responseString = response.body;
-//     return responseString;
-//   }else{
-//     return null;
-//   }
-//
-//   }
 
 class _SignUpState extends State<SignUp> {
   var fullNameController = TextEditingController();
@@ -80,12 +29,15 @@ class _SignUpState extends State<SignUp> {
   var passwordController = TextEditingController();
   var passwordConfirmController = TextEditingController();
 
-  // UserDB userDB = UserDB();
   String fullName;
   String email;
   String phone;
   String password;
   String passwordConfirm;
+
+  File imageFile;
+  final picker = ImagePicker();
+  String base64Image;
 
   final scaffoldKey = new GlobalKey<ScaffoldState>();
   BuildContext context;
@@ -97,14 +49,20 @@ class _SignUpState extends State<SignUp> {
       backgroundColor: kBackgroundTheme,
       appBar: new AppBar(
         backgroundColor: kBackgroundTheme,
-        title: new Text("Sign Up", style: TextStyle(fontSize: 18, color: kPrimaryTheme),),
+        title: new Text(
+          "Sign Up",
+          style: TextStyle(fontSize: 18, color: kPrimaryTheme),
+        ),
         centerTitle: false,
         elevation: 0.0,
         leading: IconButton(
-          onPressed: (){
+          onPressed: () {
             Navigator.pop(context);
           },
-          icon: Icon(Icons.arrow_back_ios_outlined, color: kPrimaryTheme,),
+          icon: Icon(
+            Icons.arrow_back_ios_outlined,
+            color: kPrimaryTheme,
+          ),
         ),
         actions: [
           TextButton(
@@ -123,9 +81,81 @@ class _SignUpState extends State<SignUp> {
       ),
       body: new SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.only(left: 18.0, right: 18, top: 35),
+          padding: const EdgeInsets.only(left: 18.0, right: 18, top: 20),
           child: new Column(
             children: <Widget>[
+              SizedBox(
+                height: 115,
+                width: 115,
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  fit: StackFit.expand,
+                  children: [
+                    CircleAvatar(
+                      radius: 50,
+                      backgroundImage: imageFile == null
+                          ? AssetImage('assets/images/no_user.jpg')
+                          : FileImage(imageFile),
+                    ),
+                    Positioned(
+                      right: -16,
+                      bottom: 0,
+                      child: SizedBox(
+                        height: 46,
+                        width: 46,
+                        child: FlatButton(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50),
+                            side: BorderSide(color: Colors.black12),
+                          ),
+                          color: Colors.grey[200],
+                          onPressed: () async {
+                            final pickedFile = await picker.getImage(
+                                source: ImageSource.gallery);
+                            print('picker: ${pickedFile}');
+                            if (pickedFile != null) {
+                              File croppedFile = await ImageCropper.cropImage(
+                                sourcePath: pickedFile.path,
+                                aspectRatioPresets: [
+                                  CropAspectRatioPreset.square,
+                                  CropAspectRatioPreset.ratio3x2,
+                                  CropAspectRatioPreset.original,
+                                  CropAspectRatioPreset.ratio4x3,
+                                  CropAspectRatioPreset.ratio16x9
+                                ],
+                                androidUiSettings: AndroidUiSettings(
+                                  toolbarTitle: 'Cropper',
+                                  toolbarColor: Colors.green[700],
+                                  toolbarWidgetColor: Colors.white,
+                                  activeControlsWidgetColor: Colors.green[700],
+                                  initAspectRatio:
+                                      CropAspectRatioPreset.original,
+                                  lockAspectRatio: false,
+                                ),
+                                iosUiSettings: IOSUiSettings(
+                                  minimumAspectRatio: 1.0,
+                                ),
+                              );
+                              if (croppedFile != null) {
+                                setState(() {
+                                  imageFile = croppedFile;
+                                });
+                                encodeImage();
+                              }
+                            }
+                          },
+                          child: SvgPicture.asset(
+                            "assets/images/Camera Icon.svg",
+                          ),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: 15,
+              ),
               Container(
                 height: 48,
                 margin: EdgeInsets.all(5),
@@ -144,15 +174,20 @@ class _SignUpState extends State<SignUp> {
                     decoration: InputDecoration(
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(color: Colors.black87, width: 0.0),
+                        borderSide:
+                            const BorderSide(color: Colors.black87, width: 0.0),
                       ),
                       focusedBorder: OutlineInputBorder(
-                          borderRadius: const BorderRadius.all(
-                              Radius.circular(10),
-                          ),
-                        borderSide: const BorderSide(color: kPrimaryTheme, width: 0.7),
+                        borderRadius: const BorderRadius.all(
+                          Radius.circular(10),
+                        ),
+                        borderSide:
+                            const BorderSide(color: kPrimaryTheme, width: 0.7),
                       ),
-                      prefixIcon: Icon(Icons.person, color: Colors.black54,),
+                      prefixIcon: Icon(
+                        Icons.person,
+                        color: Colors.black54,
+                      ),
                       hintText: 'FullName',
                       hintStyle: TextStyle(fontSize: 17, color: Colors.black54),
                     ),
@@ -180,15 +215,19 @@ class _SignUpState extends State<SignUp> {
                     decoration: InputDecoration(
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(color: Colors.black87, width: 0.0),
+                        borderSide:
+                            const BorderSide(color: Colors.black87, width: 0.0),
                       ),
                       focusedBorder: OutlineInputBorder(
-                          borderRadius: const BorderRadius.all(
-                              Radius.circular(10)
-                          ),
-                        borderSide: const BorderSide(color: kPrimaryTheme, width: 0.7),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(10)),
+                        borderSide:
+                            const BorderSide(color: kPrimaryTheme, width: 0.7),
                       ),
-                      prefixIcon: Icon(Icons.phone, color: Colors.black54,),
+                      prefixIcon: Icon(
+                        Icons.phone,
+                        color: Colors.black54,
+                      ),
                       hintText: 'Phone',
                       hintStyle: TextStyle(fontSize: 17, color: Colors.black54),
                       border: InputBorder.none,
@@ -217,15 +256,19 @@ class _SignUpState extends State<SignUp> {
                     decoration: InputDecoration(
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(color: Colors.black87, width: 0.0),
+                        borderSide:
+                            const BorderSide(color: Colors.black87, width: 0.0),
                       ),
                       focusedBorder: OutlineInputBorder(
-                          borderRadius: const BorderRadius.all(
-                              Radius.circular(10)
-                          ),
-                        borderSide: const BorderSide(color: kPrimaryTheme, width: 0.7),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(10)),
+                        borderSide:
+                            const BorderSide(color: kPrimaryTheme, width: 0.7),
                       ),
-                      prefixIcon: Icon(Icons.mail, color: Colors.black54,),
+                      prefixIcon: Icon(
+                        Icons.mail,
+                        color: Colors.black54,
+                      ),
                       hintText: 'Email',
                       hintStyle: TextStyle(fontSize: 17, color: Colors.black54),
                       border: InputBorder.none,
@@ -255,15 +298,19 @@ class _SignUpState extends State<SignUp> {
                     decoration: InputDecoration(
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(color: Colors.black87, width: 0.0),
+                        borderSide:
+                            const BorderSide(color: Colors.black87, width: 0.0),
                       ),
                       focusedBorder: OutlineInputBorder(
-                          borderRadius: const BorderRadius.all(
-                              Radius.circular(10)
-                          ),
-                        borderSide: const BorderSide(color: kPrimaryTheme, width: 0.7),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(10)),
+                        borderSide:
+                            const BorderSide(color: kPrimaryTheme, width: 0.7),
                       ),
-                      prefixIcon: Icon(Icons.lock, color: Colors.black54,),
+                      prefixIcon: Icon(
+                        Icons.lock,
+                        color: Colors.black54,
+                      ),
                       hintText: 'Password',
                       hintStyle: TextStyle(fontSize: 17, color: Colors.black54),
                       border: InputBorder.none,
@@ -293,15 +340,19 @@ class _SignUpState extends State<SignUp> {
                     decoration: InputDecoration(
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(color: Colors.black87, width: 0.0),
+                        borderSide:
+                            const BorderSide(color: Colors.black87, width: 0.0),
                       ),
                       focusedBorder: OutlineInputBorder(
-                          borderRadius: const BorderRadius.all(
-                              Radius.circular(10)
-                          ),
-                        borderSide: const BorderSide(color: kPrimaryTheme, width: 0.7),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(10)),
+                        borderSide:
+                            const BorderSide(color: kPrimaryTheme, width: 0.7),
                       ),
-                      prefixIcon: Icon(Icons.lock, color: Colors.black54,),
+                      prefixIcon: Icon(
+                        Icons.lock,
+                        color: Colors.black54,
+                      ),
                       hintText: 'Password Confirm',
                       hintStyle: TextStyle(fontSize: 17, color: Colors.black54),
                       border: InputBorder.none,
@@ -384,6 +435,13 @@ class _SignUpState extends State<SignUp> {
     );
   }
 
+  void encodeImage() {
+    if (imageFile != null) {
+      final bytes = imageFile.readAsBytesSync();
+      base64Image = base64Encode(bytes);
+    }
+  }
+
   bool isValidEntries(BuildContext context) {
     if (fullNameController.text.length == 0) {
       new UtilityService().showMessage(
@@ -428,8 +486,7 @@ class _SignUpState extends State<SignUp> {
         ),
       );
       return false;
-    }
-     else if (passwordController.text != passwordConfirmController.text) {
+    } else if (passwordController.text != passwordConfirmController.text) {
       new UtilityService().showMessage(
         context: context,
         message: 'Please retype to confirm password',
@@ -503,9 +560,11 @@ class _SignUpState extends State<SignUp> {
             context,
             MaterialPageRoute(
               builder: (context) => OtpScreen(
-                  otpModel: otpModel,
-                  track: 'Registration',
-                  ),
+                otpModel: otpModel,
+                track: 'Registration',
+                encodedImage: base64Image,
+                password: passwordConfirm,
+              ),
             ),
           );
         }

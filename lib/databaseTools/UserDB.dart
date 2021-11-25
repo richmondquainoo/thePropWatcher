@@ -1,10 +1,8 @@
-
-
 import 'package:elandguard/model/UserProfileModel.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
-class UserDB{
+class UserDB {
   var database;
 
   Future<void> initialize() async {
@@ -13,14 +11,14 @@ class UserDB{
       onCreate: (db, version) {
         return db.execute(
           "CREATE Table land("
-              "id INTEGER PRIMARY KEY AUTOINCREMENT, "
-              "picture TEXT, "
-              "profileName TEXT, "
-              "name TEXT, "
-              "password TEXT, "
-              "phone TEXT, "
-              "email TEXT "
-              ")",
+          "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+          "picture TEXT, "
+          "profileName TEXT, "
+          "name TEXT, "
+          "password TEXT, "
+          "phone TEXT, "
+          "email TEXT "
+          ")",
         );
       },
       version: 1,
@@ -43,6 +41,22 @@ class UserDB{
     return true;
   }
 
+  Future<bool> updateObject(UserProfileModel model) async {
+    try {
+      final Database db = await database; // Get a reference to the database.
+      print('Database(UserProfileModel): $db');
+      await db.update(
+        'land',
+        model.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    } catch (e) {
+      print('Update Error(UserProfileModel): $e');
+      return false;
+    }
+    return true;
+  }
+
   Future<List<UserProfileModel>> getAllUsers() async {
     try {
       final Database db = await database;
@@ -52,7 +66,7 @@ class UserDB{
 
       return List.generate(
         maps.length,
-            (i) {
+        (i) {
           return UserProfileModel(
             id: maps[i]['id'],
             picture: maps[i]['picture'],
@@ -68,10 +82,10 @@ class UserDB{
       print('Fetch Error(getAllUsers): $e');
       return null;
     }
-
   }
 
-  Future<UserProfileModel> authenticateUser(String email, String password) async {
+  Future<UserProfileModel> authenticateUser(
+      String email, String password) async {
     try {
       final Database db = await database;
 
@@ -80,7 +94,7 @@ class UserDB{
           'select * from land where email=\'$email\' and password=\'$password\'');
       return List.generate(
         maps.length,
-            (i) {
+        (i) {
           return UserProfileModel(
             id: maps[i]['id'],
             picture: maps[i]['picture'],
@@ -103,11 +117,11 @@ class UserDB{
       final Database db = await database;
 
       // Query the obj
-      final List<Map<String, dynamic>> maps = await db
-          .rawQuery('select * from land where password=\'$password\'');
+      final List<Map<String, dynamic>> maps =
+          await db.rawQuery('select * from land where password=\'$password\'');
       return List.generate(
         maps.length,
-            (i) {
+        (i) {
           return UserProfileModel(
             id: maps[i]['id'],
             picture: maps[i]['picture'],
@@ -130,11 +144,11 @@ class UserDB{
       final Database db = await database;
 
       // Query the obj
-      final List<Map<String, dynamic>> maps = await db
-          .rawQuery('select * from land where email=\'$email\'');
+      final List<Map<String, dynamic>> maps =
+          await db.rawQuery('select * from land where email=\'$email\'');
       return List.generate(
         maps.length,
-            (i) {
+        (i) {
           return UserProfileModel(
             id: maps[i]['id'],
             picture: maps[i]['picture'],
@@ -161,7 +175,7 @@ class UserDB{
           .rawQuery('select * from land where profileName=\'$profileName\' ');
       return List.generate(
         maps.length,
-            (i) {
+        (i) {
           return UserProfileModel(
             id: maps[i]['id'],
             picture: maps[i]['picture'],

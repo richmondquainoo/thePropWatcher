@@ -1,11 +1,11 @@
 class UserProfileModel {
-  final int id;
-  final String picture;
-  final String profileName;
-  final String name;
-  final String password;
-  final String phone;
-  final String email;
+  int id;
+  String picture;
+  String profileName;
+  String name;
+  String password;
+  String phone;
+  String email;
 
   UserProfileModel({
     this.id,

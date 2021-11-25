@@ -1,24 +1,28 @@
 //import 'package:cloud_firestore/cloud_firestore.dart';
+
+import 'dart:convert';
 import 'dart:io';
+
 import 'package:elandguard/Constants/myColors.dart';
-import 'package:elandguard/adminScreens/admin_home.dart';
 import 'package:elandguard/constants.dart';
 import 'package:elandguard/databaseTools/UserDB.dart';
 import 'package:elandguard/databaseTools/UserDBImp.dart';
+import 'package:elandguard/model/AppData.dart';
 import 'package:elandguard/model/UserProfileModel.dart';
-
-import 'package:elandguard/userScreens/Payment/PaymentScreen.dart';
+import 'package:elandguard/userScreens/Invoice/InvoiceScreen.dart';
 import 'package:elandguard/userScreens/Settings/ProfileSettingsScreen.dart';
-import 'package:elandguard/userScreens/SplashScreen/Splash%20Screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
 
+import 'History/history.dart';
+import 'Login/login.dart';
 import 'Payment/Payment.dart';
 import 'aboutUs.dart';
 import 'delivery.dart';
-import 'History/history.dart';
 import 'notifications.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -27,11 +31,9 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
   UserDBImplementation dbImplementation = UserDBImplementation();
   UserDB userDB = UserDB();
   UserProfileModel user;
-
 
   BuildContext context;
   String acctName = "";
@@ -39,8 +41,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String acctPhotoURL = "";
   bool isLoggedIn;
 
-  // AppMethods appMethods = new FirebaseMethods();
-  //
+  File imageFile;
 
   @override
   void initState() {
@@ -48,42 +49,30 @@ class _MyHomePageState extends State<MyHomePage> {
     // getCurrentUser();
   }
 
-  //
-  // @override
-  // Widget build(BuildContext context) {
-  //   // TODO: implement build
-  //   throw UnimplementedError();
-  // }
-  //   // TODO: implement initState
-  //   // getCurrentUser();
-  // }
-  //
-  // Future getCurrentUser() async {
-  //   //acctName = await getStringDataLocally(key: acctFullName);
-  //   //acctEmail = await getStringDataLocally(key: userEmail);
-  //   acctPhotoURL = await getStringDataLocally(key: photoURL);
-  //   isLoggedIn = await getBoolDataLocally(key: loggedIN);
-  //
-  //   var data = json.decode(loginUser);
-  //   var responsedata = data['data'];
-  //   for (var items in responsedata) {
-  //     //iterate over the list
-  //     Map myMap = items; //store each map
-  //     acctName = myMap['fullname'];
-  //     acctEmail = myMap['email_address'];
-  //     AppGlobals.global_user_id = myMap['userid'].toString();
-  //   }
-  //
-  //   //print(await getStringDataLocally(key: userEmail));
-  //   acctName == null ? acctName = "name" : acctName;
-  //   acctEmail == null ? acctEmail = "email" : acctEmail;
-  //   setState(() {});
-  // }
-
+  void setProfilePicture() async {
+    try {
+      if (user.picture != null) {
+        final decodedBytes = base64Decode(user.picture);
+        final directory = await getApplicationDocumentsDirectory();
+        var file = File("${directory.path}/profile.png");
+        file.writeAsBytesSync(decodedBytes);
+        setState(() {
+          imageFile = file;
+        });
+      }
+    } catch (e) {
+      print('setProfilePicture err: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    // this.context = context;
+    setState(() {
+      user = Provider.of<AppData>(context, listen: false).userData;
+      setProfilePicture();
+    });
+
+    // print('User from home page: $user');
     return Scaffold(
       appBar: new AppBar(
         backgroundColor: kPrimaryTheme,
@@ -111,7 +100,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(12.0),
         child: new Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
@@ -119,7 +108,9 @@ class _MyHomePageState extends State<MyHomePage> {
               height: 10.0,
             ),
             Text(
-              "Welcome back, John.",
+              (user != null && user.name != null)
+                  ? "Welcome back, ${user.name}."
+                  : "Welcome back.",
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: GoogleFonts.quicksand(
@@ -154,8 +145,12 @@ class _MyHomePageState extends State<MyHomePage> {
               Expanded(
                 child: GestureDetector(
                   onTap: () {
-                    // Navigator.of(context).push(new CupertinoPageRoute(
-                    //     builder: (context) => ScanScreen()));
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => InvoiceScreen(),
+                      ),
+                    );
                   },
                   child: Container(
                     height: 88,
@@ -180,7 +175,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             height: 30,
                             child: Image(
                               image:
-                              AssetImage("assets/images/circleCheck.png"),
+                                  AssetImage("assets/images/circleCheck.png"),
                               color: Colors.teal,
                             ),
                           ),
@@ -405,7 +400,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             height: 30,
                             child: Image(
                               image:
-                              AssetImage("assets/images/location-pin.png"),
+                                  AssetImage("assets/images/location-pin.png"),
                               color: Colors.pink,
                             ),
                           ),
@@ -796,8 +791,9 @@ class _MyHomePageState extends State<MyHomePage> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             CircleAvatar(
-                              backgroundImage:
-                              AssetImage('assets/images/no_user.jpg'),
+                              backgroundImage: imageFile == null
+                                  ? AssetImage('assets/images/no_user.jpg')
+                                  : FileImage(imageFile),
                               radius: 25,
                             ),
                             SizedBox(
@@ -808,7 +804,9 @@ class _MyHomePageState extends State<MyHomePage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "username",
+                                  (user != null && user.name != null)
+                                      ? "${user.name}"
+                                      : "User",
                                   style: GoogleFonts.lato(
                                       fontSize: 17,
                                       fontWeight: FontWeight.w600,
@@ -834,7 +832,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       onTap: () {
                         Navigator.of(context).push(new CupertinoPageRoute(
                             builder: (BuildContext context) =>
-                            new GirliesNotifications()));
+                                new GirliesNotifications()));
                       },
                     ),
                     new ListTile(
@@ -851,7 +849,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       onTap: () {
                         Navigator.of(context).push(new CupertinoPageRoute(
                             builder: (BuildContext context) =>
-                            new HistoryScreen()));
+                                new HistoryScreen()));
                       },
                     ),
                     new Divider(
@@ -873,7 +871,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       onTap: () {
                         Navigator.of(context).push(new CupertinoPageRoute(
                             builder: (BuildContext context) =>
-                            new ProfileSettingsScreen()));
+                                new ProfileSettingsScreen()));
                       },
                     ),
                     new ListTile(
@@ -890,7 +888,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       onTap: () {
                         Navigator.of(context).push(new CupertinoPageRoute(
                             builder: (BuildContext context) =>
-                            new GirliesDelivery()));
+                                new GirliesDelivery()));
                       },
                     ),
                     new ListTile(
@@ -906,8 +904,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       title: new Text("Payment"),
                       onTap: () {
                         Navigator.of(context).push(new CupertinoPageRoute(
-                            builder: (BuildContext context) =>
-                                Payment()));
+                            builder: (BuildContext context) => Payment()));
                       },
                     ),
                     new Divider(
@@ -929,7 +926,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       onTap: () {
                         Navigator.of(context).push(new CupertinoPageRoute(
                             builder: (BuildContext context) =>
-                            new GirliesAboutUs()));
+                                new GirliesAboutUs()));
                       },
                       //
                     ),
@@ -945,9 +942,20 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                       title: new Text("Logout"),
                       onTap: () {
-                        Navigator.of(context).push(new CupertinoPageRoute(
-                            builder: (BuildContext context) =>
-                            new SplashScreen()));
+                        showAlertDialog(
+                          context: context,
+                          title: 'Confirm Logout',
+                          message: 'Are you sure you want to log out?',
+                          cancelText: 'No',
+                          proceedText: 'Yes',
+                          cancelFunction: () {
+                            Navigator.of(context, rootNavigator: true).pop();
+                          },
+                          proceedFunction: () {
+                            Navigator.of(context, rootNavigator: true).pop();
+                            clearUserDB(context);
+                          },
+                        );
                       },
                     ),
                     SizedBox(
@@ -998,6 +1006,54 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
       ),
+    );
+  }
+
+  void clearUserDB(BuildContext context) async {
+    try {
+      await dbImplementation.deleteAll();
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => LoginScreen(),
+        ),
+      );
+    } catch (e) {
+      print('Clear user db error: $e');
+    }
+  }
+
+  showAlertDialog(
+      {BuildContext context,
+      String title,
+      String message,
+      String cancelText,
+      String proceedText,
+      Function cancelFunction,
+      Function proceedFunction}) {
+    // set up the buttons
+    Widget cancelButton = FlatButton(
+      child: Text(cancelText),
+      onPressed: cancelFunction,
+    );
+    Widget continueButton = FlatButton(
+      child: Text(proceedText),
+      onPressed: proceedFunction,
+    );
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text(title),
+      content: Text(message),
+      actions: [
+        cancelButton,
+        continueButton,
+      ],
+    );
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
     );
   }
 
@@ -1084,7 +1140,6 @@ class _MyHomePageState extends State<MyHomePage> {
   //   if (response == true) getCurrentUser(); */
   // }
 
-
   // openAdmin() {
   //   Navigator.of(context).push(new MaterialPageRoute(
   //       builder: (BuildContext context) => new AdminHome()));
@@ -1120,10 +1175,7 @@ class _MyHomePageState extends State<MyHomePage> {
           Container(
             padding: EdgeInsets.only(
               // left side padding is 40% of total width
-              left: MediaQuery
-                  .of(context)
-                  .size
-                  .width * .4,
+              left: MediaQuery.of(context).size.width * .4,
               top: 20,
               right: 20,
             ),

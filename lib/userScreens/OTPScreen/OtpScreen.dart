@@ -1,48 +1,65 @@
 import 'dart:convert';
+
 import 'package:elandguard/Component/ProgressDialog.dart';
-import 'package:elandguard/Component/TopBarComponent.dart';
 import 'package:elandguard/Constants/myColors.dart';
 import 'package:elandguard/Util/NetworkUtility.dart';
 import 'package:elandguard/Util/Utility.dart';
 import 'package:elandguard/Util/paths.dart';
+import 'package:elandguard/databaseTools/UserDB.dart';
+import 'package:elandguard/databaseTools/UserDBImp.dart';
+import 'package:elandguard/model/AppData.dart';
 import 'package:elandguard/model/OtpModel.dart';
+import 'package:elandguard/model/UserProfileModel.dart';
 import 'package:elandguard/userScreens/Login/login.dart';
-import 'package:elandguard/userScreens/SetProfileDetails/SetProfile.dart';
+import 'package:elandguard/userScreens/ResetPassword/ResetPassword.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart';
 import 'package:otp_text_field/otp_field.dart';
 import 'package:otp_text_field/otp_field_style.dart';
 import 'package:otp_text_field/style.dart';
+import 'package:provider/provider.dart';
+
+import '../myHomePage.dart';
 
 class OtpScreen extends StatefulWidget {
   final OTPModel otpModel;
   final String track;
+  final String encodedImage;
+  final String password;
 
-  OtpScreen({this.otpModel,this.track});
+  OtpScreen({this.otpModel, this.track, this.encodedImage, this.password});
 
   @override
-  _OtpScreenState createState() => _OtpScreenState(otpModel: otpModel, track: track);
+  _OtpScreenState createState() => _OtpScreenState(
+      otpModel: otpModel,
+      track: track,
+      encodedImage: encodedImage,
+      password: password);
 }
 
 class _OtpScreenState extends State<OtpScreen> {
   final OTPModel otpModel;
   final String track;
+  final String encodedImage;
+  final String password;
   String globalPin;
-  String caption = 'Enter the verification code we just sent to your email address.';
-
+  String caption =
+      'Enter the verification code we just sent to your email address.';
 
   @override
   void initState() {
     super.initState();
-    if(otpModel != null && otpModel.email != null){
-      caption = 'Enter the verification code we just sent to your email address '
-          '${otpModel.email.substring(0,1)}'
-          '***${otpModel.email.substring(otpModel.email.length-3)}';
+    if (otpModel != null && otpModel.email != null) {
+      caption =
+          'Enter the verification code we just sent to your email address '
+          '${otpModel.email.substring(0, 1)}'
+          '***${otpModel.email.substring(otpModel.email.length - 3)}';
     }
   }
 
-  _OtpScreenState({this.otpModel, this.track});
+  _OtpScreenState(
+      {this.otpModel, this.track, this.encodedImage, this.password});
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +69,7 @@ class _OtpScreenState extends State<OtpScreen> {
         backgroundColor: kBackgroundTheme,
         elevation: 0.0,
         leading: IconButton(
-          onPressed: (){
+          onPressed: () {
             Navigator.pop(context);
           },
           icon: Icon(
@@ -233,10 +250,16 @@ class _OtpScreenState extends State<OtpScreen> {
     //  Compare the input text to the one provided by the user
     bool canProceed = isValidInput(context);
     if (canProceed) {
-      if(track=='Registration')
-        registerUser(otpModel: otpModel, context: context);
-      if(track=="Reset")
-        goToSetPin(context, otpModel);
+      if (track == 'Registration') {
+        UserProfileModel model = UserProfileModel(
+          name: otpModel.name,
+          email: otpModel.email,
+          phone: otpModel.phone,
+          password: password,
+        );
+        registerUser(userProfileModel: model, context: context);
+      }
+      if (track == "Reset") goToSetPin(context, otpModel);
     }
   }
 
@@ -265,15 +288,16 @@ class _OtpScreenState extends State<OtpScreen> {
     }
   }
 
-  void registerUser({OTPModel otpModel, BuildContext context}) async {
+  void registerUser(
+      {UserProfileModel userProfileModel, BuildContext context}) async {
     showDialog(
       context: context,
       builder: (context) {
         return ProgressDialog(displayMessage: 'Please wait...');
       },
     );
-    print(otpModel);
-    var jsonBody = jsonEncode(otpModel);
+    // print(userProfileModel);
+    var jsonBody = jsonEncode(userProfileModel);
     NetworkUtility networkUtility = NetworkUtility();
     Response response = await networkUtility.postDataWithAuth(
         url: CREATE_USER_URL, body: jsonBody, auth: 'Bearer $ACCESS_TOKEN');
@@ -317,20 +341,53 @@ class _OtpScreenState extends State<OtpScreen> {
             // Navigator.of(context, rootNavigator: true).pop();
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => LoginScreen()));
-            Navigator.of(context,rootNavigator: true).pop();
+            Navigator.of(context, rootNavigator: true).pop();
           });
     } else {
-      goToSetPin(context, otpModel);
+      goToHome(context, otpModel);
     }
+  }
+
+  void saveUserDetailsLocally(OTPModel otpModel) async {
+    try {
+      UserDBImplementation dbImplementation = UserDBImplementation();
+      UserDB userDB = UserDB();
+      UserProfileModel user = UserProfileModel(
+          name: otpModel.name,
+          email: otpModel.email,
+          phone: otpModel.phone,
+          password: password,
+          picture: encodedImage);
+
+      await userDB.initialize();
+      await userDB.deleteAll();
+
+      await dbImplementation.saveUser(user);
+      Provider.of<AppData>(context, listen: false).updateUserData(user);
+    } catch (e) {
+      print('saving user data to local db error: $e');
+    }
+  }
+
+  void goToHome(BuildContext context, OTPModel otpModel) {
+    saveUserDetailsLocally(otpModel);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MyHomePage(),
+      ),
+    );
   }
 
   void goToSetPin(BuildContext context, OTPModel otpModel) {
     Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => SetProfileScreen(
-                  otpModel: otpModel,
-                )));
+      context,
+      MaterialPageRoute(
+        builder: (context) => SetProfileScreen(
+          otpModel: otpModel,
+        ),
+      ),
+    );
   }
 
   void createOTP({OTPModel dataModel, BuildContext context}) async {
