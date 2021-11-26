@@ -1,3 +1,5 @@
+
+import 'package:elandguard/userScreens/AddCoordinates/addCoordinatesScreen.dart';
 import 'package:elandguard/userScreens/SplashScreen/Splash%20Screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -18,7 +20,7 @@ class MyApp extends StatelessWidget {
         theme: new ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: SplashScreen(),
+        home: AddCoordinatesScreen(),
       ),
     );
   }
