@@ -1,4 +1,3 @@
-
 import 'package:elandguard/Component/AccountSettings.dart';
 import 'package:elandguard/Constants/myColors.dart';
 import 'package:elandguard/userScreens/Settings/profile.dart';
@@ -7,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'ChangePassword.dart';
 
 class ProfileSettingsScreen extends StatefulWidget {
-
   @override
   _ProfileSettingsScreenState createState() => _ProfileSettingsScreenState();
 }
@@ -84,28 +82,28 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
                 endIndent: 20,
                 indent: 20,
               ),
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ChangePassword(),
-                    ),
-                  );
-                },
-                child: Container(
-                  color: Colors.transparent,
-                  child: AccountSettings(
-                    selectIcon: Icons.lock,
-                    settingText: "Change Password",
-                  ),
-                ),
-              ),
-              Divider(
-                color: Colors.black38,
-                endIndent: 20,
-                indent: 20,
-              ),
+              // GestureDetector(
+              //   onTap: () {
+              //     Navigator.push(
+              //       context,
+              //       MaterialPageRoute(
+              //         builder: (context) => ChangePassword(),
+              //       ),
+              //     );
+              //   },
+              //   child: Container(
+              //     color: Colors.transparent,
+              //     child: AccountSettings(
+              //       selectIcon: Icons.lock,
+              //       settingText: "Change Password",
+              //     ),
+              //   ),
+              // ),
+              // Divider(
+              //   color: Colors.black38,
+              //   endIndent: 20,
+              //   indent: 20,
+              // ),
               // AccountSettings(
               //   selectIcon: Icons.vpn_key_sharp,
               //   settingText: "Set pin",

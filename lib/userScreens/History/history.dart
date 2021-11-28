@@ -1,5 +1,4 @@
 import 'package:elandguard/Constants/myColors.dart';
-import 'package:elandguard/userScreens/Payment/PaymentScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -24,10 +23,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 padding: const EdgeInsets.all(12.0),
                 child: GestureDetector(
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => PaymentScreen()),
-                    );
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(builder: (context) => PaymentScreen()),
+                    // );
                   },
                   child: Container(
                     height: 88,

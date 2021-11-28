@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:elandguard/Constants/myColors.dart';
+import 'package:elandguard/Util/paths.dart';
 import 'package:elandguard/userScreens/Login/login.dart';
 import 'package:flutter/material.dart';
 
@@ -12,7 +13,6 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     Timer(
         Duration(seconds: 5),
@@ -30,7 +30,9 @@ class _SplashScreenState extends State<SplashScreen> {
         fit: StackFit.expand,
         children: <Widget>[
           Container(
-            decoration: BoxDecoration(color: kBackgroundTheme,),
+            decoration: BoxDecoration(
+              color: kBackgroundTheme,
+            ),
           ),
           Column(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -73,7 +75,7 @@ class _SplashScreenState extends State<SplashScreen> {
                       padding: EdgeInsets.only(top: 20.0),
                     ),
                     Text(
-                      "Version 1.0.1",
+                      "Version $VERSION",
                       softWrap: true,
                       textAlign: TextAlign.center,
                       style: TextStyle(

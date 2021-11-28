@@ -386,6 +386,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
       await dbImplementation.saveUser(user);
       Provider.of<AppData>(context, listen: false).updateUserData(user);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MyHomePage(),
+        ),
+      );
     } catch (e) {
       print('saving user data to local db error: $e');
     }

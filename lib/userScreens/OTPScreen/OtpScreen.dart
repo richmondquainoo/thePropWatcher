@@ -353,17 +353,20 @@ class _OtpScreenState extends State<OtpScreen> {
       UserDBImplementation dbImplementation = UserDBImplementation();
       UserDB userDB = UserDB();
       UserProfileModel user = UserProfileModel(
-          name: otpModel.name,
-          email: otpModel.email,
-          phone: otpModel.phone,
-          password: password,
-          picture: encodedImage);
+        name: otpModel.name,
+        email: otpModel.email,
+        phone: otpModel.phone,
+        password: password,
+        picture: encodedImage,
+      );
 
       await userDB.initialize();
       await userDB.deleteAll();
 
       await dbImplementation.saveUser(user);
-      Provider.of<AppData>(context, listen: false).updateUserData(user);
+      setState(() {
+        Provider.of<AppData>(context, listen: false).updateUserData(user);
+      });
     } catch (e) {
       print('saving user data to local db error: $e');
     }

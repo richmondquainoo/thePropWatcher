@@ -3,27 +3,32 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:elandguard/Component/ProgressDialog.dart';
 import 'package:elandguard/Constants/myColors.dart';
+import 'package:elandguard/Util/NetworkUtility.dart';
+import 'package:elandguard/Util/Utility.dart';
+import 'package:elandguard/Util/paths.dart';
 import 'package:elandguard/constants.dart';
 import 'package:elandguard/databaseTools/UserDB.dart';
 import 'package:elandguard/databaseTools/UserDBImp.dart';
 import 'package:elandguard/model/AppData.dart';
+import 'package:elandguard/model/InvoiceModel.dart';
+import 'package:elandguard/model/ServiceCharge.dart';
 import 'package:elandguard/model/UserProfileModel.dart';
 import 'package:elandguard/userScreens/Invoice/InvoiceScreen.dart';
-import 'package:elandguard/userScreens/Settings/ProfileSettingsScreen.dart';
+import 'package:elandguard/userScreens/Notifications/NotificationScreen.dart';
+import 'package:elandguard/userScreens/Payment/PaymentHistoryScreen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
-import 'History/history.dart';
 import 'Login/login.dart';
-import 'Payment/Payment.dart';
+import 'TrackJob/TrackJobScreen.dart';
 import 'aboutUs.dart';
-import 'delivery.dart';
-import 'notifications.dart';
 
 class MyHomePage extends StatefulWidget {
   @override
@@ -67,10 +72,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    setState(() {
-      user = Provider.of<AppData>(context, listen: false).userData;
-      setProfilePicture();
-    });
+    user = Provider.of<AppData>(context, listen: false).userData;
+    setProfilePicture();
 
     // print('User from home page: $user');
     return Scaffold(
@@ -79,7 +82,7 @@ class _MyHomePageState extends State<MyHomePage> {
         title: GestureDetector(
           // onLongPress: openAdmin,
           child: new Text(
-            "Land Guard Services",
+            "Property Watch",
             style: GoogleFonts.lato(),
           ),
         ),
@@ -93,7 +96,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   Icons.notifications_none_outlined,
                   color: Colors.white,
                 ),
-                onPressed: () {},
+                onPressed: () {
+                  goToNotifications(context);
+                },
               ),
             ],
           )
@@ -145,12 +150,7 @@ class _MyHomePageState extends State<MyHomePage> {
               Expanded(
                 child: GestureDetector(
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => InvoiceScreen(),
-                      ),
-                    );
+                    getServiceCharge(serviceCode: 'VP', context: context);
                   },
                   child: Container(
                     height: 88,
@@ -205,8 +205,7 @@ class _MyHomePageState extends State<MyHomePage> {
               Expanded(
                 child: GestureDetector(
                   onTap: () {
-                    // Navigator.of(context).push(new CupertinoPageRoute(
-                    //     builder: (context) => VerifyCertificate()));
+                    getServiceCharge(serviceCode: 'VTC', context: context);
                   },
                   child: Container(
                     height: 88,
@@ -262,8 +261,7 @@ class _MyHomePageState extends State<MyHomePage> {
               Expanded(
                 child: GestureDetector(
                   onTap: () {
-                    // Navigator.of(context).push(new CupertinoPageRoute(
-                    //     builder: (context) => VerifyRateableValue()));
+                    getServiceCharge(serviceCode: 'VRV', context: context);
                   },
                   child: Container(
                     height: 88,
@@ -317,8 +315,12 @@ class _MyHomePageState extends State<MyHomePage> {
               Expanded(
                 child: GestureDetector(
                   onTap: () {
-                    // Navigator.of(context).push(new CupertinoPageRoute(
-                    //     builder: (context) => TrackJob()));
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => TrackJobScreen(),
+                      ),
+                    );
                   },
                   child: Container(
                     height: 88,
@@ -374,8 +376,14 @@ class _MyHomePageState extends State<MyHomePage> {
               Expanded(
                 child: GestureDetector(
                   onTap: () {
-                    // Navigator.of(context).push(new CupertinoPageRoute(
-                    //     builder: (context) => ScanScreen()));
+                    new UtilityService().showMessage(
+                      context: context,
+                      message: 'Service unavailable at the moment.',
+                      icon: Icon(
+                        Icons.error_outline,
+                        color: Colors.red,
+                      ),
+                    );
                   },
                   child: Container(
                     height: 88,
@@ -430,8 +438,14 @@ class _MyHomePageState extends State<MyHomePage> {
               Expanded(
                 child: GestureDetector(
                   onTap: () {
-                    // Navigator.of(context).push(new CupertinoPageRoute(
-                    //     builder: (context) => GirliesTrackApplication()));
+                    new UtilityService().showMessage(
+                      context: context,
+                      message: 'Service unavailable at the moment.',
+                      icon: Icon(
+                        Icons.error_outline,
+                        color: Colors.red,
+                      ),
+                    );
                   },
                   child: Container(
                     height: 88,
@@ -554,7 +568,9 @@ class _MyHomePageState extends State<MyHomePage> {
                           ),
                           Expanded(
                             child: GestureDetector(
-                              onTap: () {},
+                              onTap: () {
+                                goToNotifications(context);
+                              },
                               child: Text(
                                 "View",
                                 maxLines: 1,
@@ -627,7 +643,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           ),
                           Expanded(
                             child: Text(
-                              "0",
+                              '${(Provider.of<AppData>(context, listen: false).paymentHistory)}',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: GoogleFonts.lato(
@@ -641,7 +657,10 @@ class _MyHomePageState extends State<MyHomePage> {
                           ),
                           Expanded(
                             child: GestureDetector(
-                              onTap: () {},
+                              onTap: () {
+                                getPaymentHistory(
+                                    email: user.email, context: context);
+                              },
                               child: Text(
                                 "View",
                                 maxLines: 1,
@@ -714,7 +733,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           ),
                           Expanded(
                             child: Text(
-                              "0",
+                              '${(Provider.of<AppData>(context, listen: false).paymentHistory)}',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: GoogleFonts.lato(
@@ -728,7 +747,10 @@ class _MyHomePageState extends State<MyHomePage> {
                           ),
                           Expanded(
                             child: GestureDetector(
-                              onTap: () {},
+                              onTap: () {
+                                getPaymentHistory(
+                                    email: user.email, context: context);
+                              },
                               child: Text(
                                 "View",
                                 maxLines: 1,
@@ -752,7 +774,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             Center(
               child: Text(
-                "Version: 1.0.1",
+                "Version: $VERSION",
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: GoogleFonts.lato(
@@ -830,10 +852,13 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                       title: new Text("App Notifications"),
                       onTap: () {
-                        Navigator.of(context).push(new CupertinoPageRoute(
-                            builder: (BuildContext context) =>
-                                new GirliesNotifications()));
+                        goToNotifications(context);
                       },
+                    ),
+                    new Divider(
+                      indent: 10,
+                      endIndent: 10,
+                      color: Colors.black38,
                     ),
                     new ListTile(
                       leading: new CircleAvatar(
@@ -847,9 +872,10 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                       title: new Text("History"),
                       onTap: () {
-                        Navigator.of(context).push(new CupertinoPageRoute(
-                            builder: (BuildContext context) =>
-                                new HistoryScreen()));
+                        getPaymentHistory(
+                          email: user.email,
+                          context: context,
+                        );
                       },
                     ),
                     new Divider(
@@ -857,63 +883,59 @@ class _MyHomePageState extends State<MyHomePage> {
                       endIndent: 10,
                       color: Colors.black38,
                     ),
+                    // new ListTile(
+                    //   leading: new CircleAvatar(
+                    //     radius: 19,
+                    //     backgroundColor: Colors.blueGrey,
+                    //     child: new Icon(
+                    //       Icons.settings,
+                    //       color: Colors.white,
+                    //       size: 20.0,
+                    //     ),
+                    //   ),
+                    //   title: new Text("Settings"),
+                    //   onTap: () {
+                    //     Navigator.of(context).push(new CupertinoPageRoute(
+                    //         builder: (BuildContext context) =>
+                    //             new ProfileSettingsScreen()));
+                    //   },
+                    // ),
+                    // new ListTile(
+                    //   leading: new CircleAvatar(
+                    //     radius: 19,
+                    //     backgroundColor: Colors.deepOrange,
+                    //     child: new Icon(
+                    //       Icons.home,
+                    //       color: Colors.white,
+                    //       size: 20.0,
+                    //     ),
+                    //   ),
+                    //   title: new Text("Delivery Address"),
+                    //   onTap: () {
+                    //     Navigator.of(context).push(new CupertinoPageRoute(
+                    //         builder: (BuildContext context) =>
+                    //             new GirliesDelivery()));
+                    //   },
+                    // ),
+                    // new ListTile(
+                    //   leading: new CircleAvatar(
+                    //     radius: 19,
+                    //     backgroundColor: Colors.amber,
+                    //     child: new Icon(
+                    //       Icons.payment_rounded,
+                    //       color: Colors.white,
+                    //       size: 20.0,
+                    //     ),
+                    //   ),
+                    //   title: new Text("Payment"),
+                    //   onTap: () {
+                    //     Navigator.of(context).push(new CupertinoPageRoute(
+                    //         builder: (BuildContext context) => Payment()));
+                    //   },
+                    // ),
+
                     new ListTile(
                       leading: new CircleAvatar(
-                        radius: 19,
-                        backgroundColor: Colors.blueGrey,
-                        child: new Icon(
-                          Icons.settings,
-                          color: Colors.white,
-                          size: 20.0,
-                        ),
-                      ),
-                      title: new Text("Settings"),
-                      onTap: () {
-                        Navigator.of(context).push(new CupertinoPageRoute(
-                            builder: (BuildContext context) =>
-                                new ProfileSettingsScreen()));
-                      },
-                    ),
-                    new ListTile(
-                      leading: new CircleAvatar(
-                        radius: 19,
-                        backgroundColor: Colors.deepOrange,
-                        child: new Icon(
-                          Icons.home,
-                          color: Colors.white,
-                          size: 20.0,
-                        ),
-                      ),
-                      title: new Text("Delivery Address"),
-                      onTap: () {
-                        Navigator.of(context).push(new CupertinoPageRoute(
-                            builder: (BuildContext context) =>
-                                new GirliesDelivery()));
-                      },
-                    ),
-                    new ListTile(
-                      leading: new CircleAvatar(
-                        radius: 19,
-                        backgroundColor: Colors.amber,
-                        child: new Icon(
-                          Icons.payment_rounded,
-                          color: Colors.white,
-                          size: 20.0,
-                        ),
-                      ),
-                      title: new Text("Payment"),
-                      onTap: () {
-                        Navigator.of(context).push(new CupertinoPageRoute(
-                            builder: (BuildContext context) => Payment()));
-                      },
-                    ),
-                    new Divider(
-                      indent: 10,
-                      endIndent: 10,
-                      color: Colors.black38,
-                    ),
-                    new ListTile(
-                      trailing: new CircleAvatar(
                         radius: 19,
                         backgroundColor: Colors.cyan,
                         child: new Icon(
@@ -922,7 +944,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           size: 20.0,
                         ),
                       ),
-                      title: new Text("About Us"),
+                      title: new Text("About App"),
                       onTap: () {
                         Navigator.of(context).push(new CupertinoPageRoute(
                             builder: (BuildContext context) =>
@@ -930,8 +952,13 @@ class _MyHomePageState extends State<MyHomePage> {
                       },
                       //
                     ),
+                    new Divider(
+                      indent: 10,
+                      endIndent: 10,
+                      color: Colors.black38,
+                    ),
                     new ListTile(
-                      trailing: new CircleAvatar(
+                      leading: new CircleAvatar(
                         radius: 19,
                         backgroundColor: Colors.red,
                         child: new Icon(
@@ -942,21 +969,29 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                       title: new Text("Logout"),
                       onTap: () {
-                        showAlertDialog(
-                          context: context,
-                          title: 'Confirm Logout',
-                          message: 'Are you sure you want to log out?',
-                          cancelText: 'No',
-                          proceedText: 'Yes',
-                          cancelFunction: () {
-                            Navigator.of(context, rootNavigator: true).pop();
-                          },
-                          proceedFunction: () {
-                            Navigator.of(context, rootNavigator: true).pop();
-                            clearUserDB(context);
-                          },
-                        );
+                        new UtilityService().confirmationBox(
+                            title: 'Confirm Logout',
+                            message: 'Are you sure you want to logout?',
+                            context: context,
+                            yesColor: Colors.teal,
+                            yesLabel: 'Yes, Logout',
+                            noLabel: 'No, Cancel',
+                            noColor: Colors.deepOrange,
+                            buttonHeight: 30,
+                            buttonWidth: 100,
+                            onYes: () {
+                              Navigator.pop(context);
+                              clearUserDB(context);
+                            },
+                            onNo: () {
+                              Navigator.pop(context);
+                            });
                       },
+                    ),
+                    new Divider(
+                      indent: 10,
+                      endIndent: 10,
+                      color: Colors.black38,
                     ),
                     SizedBox(
                       height: 12,
@@ -980,7 +1015,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         children: [
                           Divider(
                             thickness: 0.3,
-                            color: Colors.blueAccent,
+                            color: Colors.teal,
                           ),
                           SizedBox(
                             height: 6,
@@ -988,11 +1023,11 @@ class _MyHomePageState extends State<MyHomePage> {
                           Center(
                             child: Container(
                               child: Text(
-                                'Version 1.0.0',
+                                'Version $VERSION',
                                 style: GoogleFonts.lato(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w400,
-                                    color: Colors.blue),
+                                    color: Colors.teal),
                               ),
                             ),
                           ),
@@ -1009,9 +1044,184 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  void goToNotifications(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => NotificationScreen(),
+      ),
+    );
+  }
+
+  void getServiceCharge({String serviceCode, BuildContext context}) async {
+    try {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return ProgressDialog(displayMessage: 'Please wait...');
+        },
+      );
+      String url = '$SERVICE_CHARGE_URL/$serviceCode';
+      // print('URL: $url');
+      NetworkUtility networkUtility = NetworkUtility();
+      Response response = await networkUtility.getDataWithAuth(
+          url: url, auth: 'Bearer $ACCESS_TOKEN');
+
+      // print('service charge response: ${response.body}');
+
+      Navigator.of(context, rootNavigator: true).pop();
+      if (response == null) {
+        //error handling
+        new UtilityService().showMessage(
+          context: context,
+          message: 'An error has occurred. Please try again',
+          icon: Icon(
+            Icons.error_outline,
+            color: Colors.red,
+          ),
+        );
+      } else {
+        var data = jsonDecode(response.body);
+
+        int status = data['status'];
+        // print('Status: $status');
+        // Handle network error
+        if (status == 500 || status == 404 || status == 403) {
+          new UtilityService().showMessage(
+            message: 'An error has occurred. Please try again',
+            icon: Icon(
+              Icons.error_outline,
+              color: Colors.red,
+            ),
+            context: context,
+          );
+        } else if (status == 200) {
+          ServiceChargeModel model = ServiceChargeModel(
+            serviceCode: data['data']['serviceCode'],
+            serviceName: data['data']['serviceName'],
+            amount: data['data']['amount'],
+            tax: data['data']['tax'],
+          );
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => InvoiceScreen(
+                serviceChargeModel: model,
+              ),
+            ),
+          );
+        } else {
+          new UtilityService().showMessage(
+            context: context,
+            message: data['message'],
+            icon: Icon(
+              Icons.error_outline,
+              color: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      print('get bill error: $e');
+    }
+  }
+
+  void getPaymentHistory({String email, BuildContext context}) async {
+    try {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return ProgressDialog(displayMessage: 'Please wait...');
+        },
+      );
+      String url = '$PAYMENT_HISTORY_URL/$email';
+      // print('URL: $url');
+      NetworkUtility networkUtility = NetworkUtility();
+      Response response = await networkUtility.getDataWithAuth(
+          url: url, auth: 'Bearer $ACCESS_TOKEN');
+
+      // print('service charge response: ${response.body}');
+
+      Navigator.of(context, rootNavigator: true).pop();
+      if (response == null) {
+        //error handling
+        new UtilityService().showMessage(
+          context: context,
+          message: 'An error has occurred. Please try again',
+          icon: Icon(
+            Icons.error_outline,
+            color: Colors.red,
+          ),
+        );
+      } else {
+        var data = jsonDecode(response.body);
+
+        int status = data['status'];
+        // print('Status: $status');
+        // Handle network error
+        if (status == 500 || status == 404 || status == 403) {
+          new UtilityService().showMessage(
+            message: 'An error has occurred. Please try again',
+            icon: Icon(
+              Icons.error_outline,
+              color: Colors.red,
+            ),
+            context: context,
+          );
+        } else if (status == 200) {
+          var list = data['data'] as List;
+          List<InvoiceModel> paymentList = [];
+          if (list.isNotEmpty) {
+            for (int i = 0; i < list.length; i++) {
+              print(data['data'][i]['status']);
+              if (data['data'][i]['status'] != null ||
+                  data['data'][i]['status'] != "null") {
+                InvoiceModel model = InvoiceModel(
+                    serviceCode: data['data'][i]['serviceCode'],
+                    serviceName: data['data'][i]['serviceName'],
+                    amount: data['data'][i]['amount'],
+                    tax: data['data'][i]['tax'],
+                    paymentAmount: data['data'][i]['paymentAmount'],
+                    paymentDate: data['data'][i]['paymentDate'],
+                    paymentMode: data['data'][i]['paymentMode'],
+                    clientReference: data['data'][i]['clientReference'],
+                    invoiceNo: data['data'][i]['invoiceNo'],
+                    status: data['data'][i]['status']);
+                paymentList.add(model);
+              }
+            }
+          }
+          setState(() {
+            Provider.of<AppData>(context, listen: false)
+                .updatePaymentHistory(paymentList.length);
+          });
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PaymentHistoryScreen(
+                list: paymentList,
+              ),
+            ),
+          );
+        } else {
+          new UtilityService().showMessage(
+            context: context,
+            message: data['message'],
+            icon: Icon(
+              Icons.error_outline,
+              color: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      print('get bill error: $e');
+    }
+  }
+
   void clearUserDB(BuildContext context) async {
     try {
-      await dbImplementation.deleteAll();
+      // await dbImplementation.deleteAll();
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) => LoginScreen(),

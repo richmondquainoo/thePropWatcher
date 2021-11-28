@@ -6,26 +6,49 @@ import 'package:elandguard/Constants/myColors.dart';
 import 'package:elandguard/Util/NetworkUtility.dart';
 import 'package:elandguard/Util/Utility.dart';
 import 'package:elandguard/Util/paths.dart';
-import 'package:elandguard/model/OtpModel.dart';
+import 'package:elandguard/model/AppData.dart';
+import 'package:elandguard/model/InvoiceModel.dart';
+import 'package:elandguard/model/ServiceCharge.dart';
 import 'package:elandguard/model/UserProfileModel.dart';
-import 'package:elandguard/userScreens/OTPScreen/OtpScreen.dart';
+import 'package:elandguard/userScreens/Payment/Payment.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:qr_flutter/qr_flutter.dart';
+import 'package:uuid/uuid.dart';
 
 class InvoiceScreen extends StatefulWidget {
-  InvoiceScreen();
+  final ServiceChargeModel serviceChargeModel;
+
+  InvoiceScreen({this.serviceChargeModel});
 
   @override
-  _InvoiceScreenState createState() => _InvoiceScreenState();
+  _InvoiceScreenState createState() =>
+      _InvoiceScreenState(serviceChargeModel: serviceChargeModel);
 }
 
 class _InvoiceScreenState extends State<InvoiceScreen> {
-  var emailController = TextEditingController();
-  _InvoiceScreenState();
+  final ServiceChargeModel serviceChargeModel;
+
+  _InvoiceScreenState({this.serviceChargeModel});
+
+  var uuid = Uuid();
+  String uuidGen;
+  DateTime now = DateTime.now();
+  String formattedDate;
+  String formattedDate1;
+  String invoiceNum;
 
   @override
   Widget build(BuildContext context) {
+    uuidGen = uuid.v4();
+    formattedDate = DateFormat('yyMMddHHmmss').format(now);
+    formattedDate1 = DateFormat('yyyy-MM-dd').format(now);
+    invoiceNum = uuidGen.substring(0, 4).toUpperCase() + "-" + formattedDate;
+    UserProfileModel user =
+        Provider.of<AppData>(context, listen: false).userData;
     return Scaffold(
       backgroundColor: kBackgroundTheme,
       appBar: AppBar(
@@ -70,12 +93,13 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                     Row(
                       children: [
                         Expanded(
+                          flex: 3,
                           child: Row(
                             children: [
                               Expanded(
                                 flex: 1,
                                 child: Text(
-                                  'Invoice #:',
+                                  'Inv #:',
                                   style: GoogleFonts.lato(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w700,
@@ -84,14 +108,14 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                 ),
                               ),
                               SizedBox(
-                                width: 5,
+                                width: 2,
                               ),
                               Expanded(
-                                flex: 1,
+                                flex: 3,
                                 child: Text(
-                                  '1232323',
+                                  '$invoiceNum',
                                   style: GoogleFonts.lato(
-                                    fontSize: 12,
+                                    fontSize: 11,
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
@@ -99,8 +123,11 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                             ],
                           ),
                         ),
-                        Expanded(child: Container()),
                         Expanded(
+                          child: Container(),
+                        ),
+                        Expanded(
+                          flex: 2,
                           child: Row(
                             children: [
                               Expanded(
@@ -120,9 +147,9 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                               Expanded(
                                 flex: 1,
                                 child: Text(
-                                  '1232323',
+                                  formattedDate1,
                                   style: GoogleFonts.lato(
-                                    fontSize: 12,
+                                    fontSize: 10,
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
@@ -187,8 +214,12 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                               Expanded(
                                 flex: 3,
                                 child: Text(
-                                  'Verify Plan',
-                                  style: GoogleFonts.montserrat(
+                                  (serviceChargeModel != null &&
+                                          serviceChargeModel.serviceName !=
+                                              null)
+                                      ? serviceChargeModel.serviceName
+                                      : '-',
+                                  style: GoogleFonts.robotoMono(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w300,
                                     // color: Colors.pink,
@@ -201,8 +232,11 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                               Expanded(
                                 flex: 1,
                                 child: Text(
-                                  '250.00',
-                                  style: GoogleFonts.montserrat(
+                                  (serviceChargeModel != null &&
+                                          serviceChargeModel.amount != null)
+                                      ? '${serviceChargeModel.amount.toStringAsFixed(2)}'
+                                      : '-',
+                                  style: GoogleFonts.robotoMono(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w300,
                                   ),
@@ -226,7 +260,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                 flex: 3,
                                 child: Text(
                                   'Tax',
-                                  style: GoogleFonts.montserrat(
+                                  style: GoogleFonts.robotoMono(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w300,
                                     // color: Colors.pink,
@@ -239,8 +273,11 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                               Expanded(
                                 flex: 1,
                                 child: Text(
-                                  '-',
-                                  style: GoogleFonts.montserrat(
+                                  (serviceChargeModel != null &&
+                                          serviceChargeModel.tax != null)
+                                      ? '${serviceChargeModel.tax.toStringAsFixed(2)}'
+                                      : '-',
+                                  style: GoogleFonts.robotoMono(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w300,
                                   ),
@@ -267,7 +304,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                 flex: 3,
                                 child: Text(
                                   'Total',
-                                  style: GoogleFonts.montserrat(
+                                  style: GoogleFonts.robotoMono(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w500,
                                     // color: Colors.pink,
@@ -280,8 +317,12 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                               Expanded(
                                 flex: 1,
                                 child: Text(
-                                  '250.00',
-                                  style: GoogleFonts.montserrat(
+                                  (serviceChargeModel != null &&
+                                          serviceChargeModel.amount != null &&
+                                          serviceChargeModel.tax != null)
+                                      ? '${(serviceChargeModel.amount + serviceChargeModel.tax).toStringAsFixed(2)}'
+                                      : '-',
+                                  style: GoogleFonts.robotoMono(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w500,
                                   ),
@@ -304,11 +345,52 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                       textColor: Colors.white,
                       label: "Proceed to make payment",
                       onTap: () {
-                        bool canProceed = isValidEntries(context);
-                        if (canProceed) {
-                          generateResetOTP(context);
-                        }
+                        new UtilityService().confirmationBox(
+                            title: 'Continue to payment checkout',
+                            message:
+                                'You will be redirected to a payment checkout screen. Please ensure that payment process'
+                                'is completed before leaving the screen.',
+                            context: context,
+                            yesColor: Colors.teal,
+                            yesLabel: 'Proceed',
+                            noLabel: 'Cancel',
+                            noColor: Colors.deepOrange,
+                            buttonHeight: 30,
+                            buttonWidth: 100,
+                            onYes: () {
+                              Navigator.pop(context);
+                              proceedToCheckout(user, context);
+                            },
+                            onNo: () {
+                              Navigator.pop(context);
+                            });
                       },
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Divider(
+                      thickness: 0.5,
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Container(),
+                        ),
+                        Expanded(
+                          child: Align(
+                            alignment: Alignment.centerRight,
+                            child: QrImage(
+                              data: invoiceNum,
+                              version: QrVersions.auto,
+                              size: 60.0,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -320,7 +402,26 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
     );
   }
 
-  Future<void> generateResetOTP(BuildContext context) async {
+  void proceedToCheckout(UserProfileModel user, BuildContext context) {
+    InvoiceModel model = InvoiceModel(
+      name: user.name,
+      phone: user.phone,
+      email: user.email,
+      // email: 'danmarfo8@gmail.com',
+      description: 'Payment for service ${serviceChargeModel.serviceName}',
+      serviceCode: serviceChargeModel.serviceCode,
+      serviceName: serviceChargeModel.serviceName,
+      amount: serviceChargeModel.amount,
+      tax: serviceChargeModel.tax,
+      totalAmount: serviceChargeModel.amount + serviceChargeModel.tax,
+      invoiceNo: invoiceNum,
+      origin: 'Phone_App',
+    );
+    proceedToPayment(context: context, invoiceModel: model);
+  }
+
+  Future<void> proceedToPayment(
+      {BuildContext context, InvoiceModel invoiceModel}) async {
     try {
       showDialog(
         context: context,
@@ -328,13 +429,13 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
           return ProgressDialog(displayMessage: 'Please wait...');
         },
       );
-      UserProfileModel model = UserProfileModel(email: emailController.text);
-      var jsonBody = jsonEncode(model);
+
+      var jsonBody = jsonEncode(invoiceModel);
       NetworkUtility networkUtility = NetworkUtility();
       Response response = await networkUtility.postDataWithAuth(
-          url: RESET_OTP_URL, body: jsonBody, auth: 'Bearer $ACCESS_TOKEN');
-
-      print('Reset otp response: ${response.body}');
+          url: CREATE_INVOICE_URL,
+          body: jsonBody,
+          auth: 'Bearer $ACCESS_TOKEN');
 
       Navigator.of(context, rootNavigator: true).pop();
 
@@ -354,7 +455,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
         var data = jsonDecode(response.body);
 
         int status = data['status'];
-        print('Status: $status');
+
         // Handle network error
         if (status == 500 || status == 404 || status == 403) {
           new UtilityService().showMessage(
@@ -366,21 +467,15 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
             context: context,
           );
         } else if (status == 200) {
-          print('Body: ${response.body}');
-          OTPModel otpModel = new OTPModel(
-            name: data['data']['name'],
-            email: data['data']['email'],
-            pin: data['data']['pin'],
-            phone: data['data']['phone'],
-            // password: passwordController.text,
-          );
-          print('otp: $otpModel');
+          invoiceModel.checkoutId = data['data']['checkoutId'];
+          invoiceModel.checkoutUrl = data['data']['checkoutUrl'];
+          invoiceModel.clientReference = data['data']['clientReference'];
+
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => OtpScreen(
-                otpModel: otpModel,
-                track: 'Reset',
+              builder: (context) => Payment(
+                invoiceModel: invoiceModel,
               ),
             ),
           );
@@ -396,7 +491,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
         }
       }
     } catch (e) {
-      print('generateResetOTP error: $e');
+      print('proceedToPayment error: $e');
       new UtilityService().showMessage(
         context: context,
         message: 'An error has occurred. Please try again',
@@ -406,24 +501,6 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
         ),
       );
       Navigator.of(context, rootNavigator: true).pop();
-    }
-  }
-
-  bool isValidEntries(BuildContext context) {
-    if (emailController.text.length == 0 ||
-        !emailController.text.contains("@") ||
-        !emailController.text.contains(".")) {
-      new UtilityService().showMessage(
-        context: context,
-        message: 'Please enter password',
-        icon: Icon(
-          Icons.error_outline,
-          color: Colors.red,
-        ),
-      );
-      return false;
-    } else {
-      return true;
     }
   }
 }

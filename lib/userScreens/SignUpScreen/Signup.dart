@@ -383,7 +383,8 @@ class _SignUpState extends State<SignUp> {
                           message:
                               'Are you sure you want to proceed with the account creation?',
                           context: context,
-                          color: Colors.blueAccent,
+                          noColor: Colors.deepOrange,
+                          yesColor: Colors.teal,
                           onYes: () {
                             Navigator.pop(context);
                             createOTP(context: context, dataModel: model);

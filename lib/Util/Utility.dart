@@ -1,8 +1,6 @@
-
 import 'package:flash/flash.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 
 class UtilityService {
   void showMessage({String message, Icon icon, BuildContext context}) {
@@ -15,7 +13,10 @@ class UtilityService {
             position: FlashPosition.bottom,
             child: FlashBar(
               icon: icon,
-              message: Text(message, style: TextStyle(color: Colors.black),),
+              message: Text(
+                message,
+                style: TextStyle(color: Colors.black),
+              ),
             ),
           );
         });
@@ -204,17 +205,16 @@ class UtilityService {
   //       });
   // }
 
-
-  void notificationMessageWithButton(
-      {String title,
-        String message,
-        BuildContext context,
-        Function proceed,
-        Color color,
-        buttonText,
-        Color textColor,
-        Color backgroundColor,
-      }) {
+  void notificationMessageWithButton({
+    String title,
+    String message,
+    BuildContext context,
+    Function proceed,
+    Color color,
+    buttonText,
+    Color textColor,
+    Color backgroundColor,
+  }) {
     showDialog(
         context: context,
         builder: (context) {
@@ -227,7 +227,9 @@ class UtilityService {
                   height: 220,
                   width: 400,
                   decoration: BoxDecoration(
-                    color:backgroundColor!=null ? backgroundColor :Colors.blueAccent,
+                    color: backgroundColor != null
+                        ? backgroundColor
+                        : Colors.blueAccent,
                     borderRadius: BorderRadius.circular(10),
                     boxShadow: [
                       BoxShadow(
@@ -268,7 +270,9 @@ class UtilityService {
                                 fontSize: 15,
                                 wordSpacing: 0.8,
                                 fontWeight: FontWeight.w400,
-                                color: textColor!= null ? textColor : Colors.black,
+                                color: textColor != null
+                                    ? textColor
+                                    : Colors.black,
                                 decoration: TextDecoration.none,
                               ),
                             ),
@@ -318,17 +322,21 @@ class UtilityService {
         });
   }
 
-  void confirmationBox(
-      {String title,
-        String message,
-        BuildContext context,
-        Function onYes,
-        Function onNo,
-        Color color,
-        String buttonLabel,
-        double buttonHeight,
-        double buttonWidth,
-      }) {
+  void confirmationBox({
+    String title,
+    String message,
+    BuildContext context,
+    Function onYes,
+    Function onNo,
+    Color color,
+    String buttonLabel,
+    double buttonHeight,
+    double buttonWidth,
+    Color yesColor,
+    Color noColor,
+    String yesLabel,
+    String noLabel,
+  }) {
     showDialog(
         context: context,
         builder: (context) {
@@ -369,10 +377,19 @@ class UtilityService {
                         ),
                       ),
                       SizedBox(
-                        height: 30,
+                        height: 5,
+                      ),
+                      Divider(
+                        thickness: 0.5,
+                        indent: 30,
+                        endIndent: 30,
+                      ),
+                      SizedBox(
+                        height: 10,
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(left: 15),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 5, horizontal: 15),
                         child: Container(
                           //alignment: Alignment.center,
                           child: Center(
@@ -385,13 +402,13 @@ class UtilityService {
                                 color: Colors.black,
                                 decoration: TextDecoration.none,
                               ),
-                              textAlign:TextAlign.center,
+                              textAlign: TextAlign.center,
                             ),
                           ),
                         ),
                       ),
                       SizedBox(
-                        height: 12,
+                        height: 20,
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -399,10 +416,10 @@ class UtilityService {
                           GestureDetector(
                             onTap: onYes,
                             child: Container(
-                             height: buttonHeight!= null ? buttonHeight : 35,
-                              width: buttonWidth!= null ? buttonWidth :64,
+                              height: buttonHeight != null ? buttonHeight : 35,
+                              width: buttonWidth != null ? buttonWidth : 64,
                               decoration: BoxDecoration(
-                                color: color,
+                                color: yesColor != null ? yesColor : color,
                                 borderRadius: BorderRadius.circular(10),
                                 boxShadow: [
                                   BoxShadow(
@@ -414,11 +431,11 @@ class UtilityService {
                               ),
                               child: Center(
                                 child: Text(
-                                  buttonLabel!=null ? buttonLabel :'Yes',
+                                  yesLabel != null ? yesLabel : 'Yes',
                                   style: TextStyle(
                                       decoration: TextDecoration.none,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w500,
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w300,
                                       color: Colors.white),
                                 ),
                               ),
@@ -430,10 +447,10 @@ class UtilityService {
                           GestureDetector(
                             onTap: onNo,
                             child: Container(
-                              height: 35,
-                              width: 64,
+                              height: buttonHeight != null ? buttonHeight : 35,
+                              width: buttonWidth != null ? buttonWidth : 64,
                               decoration: BoxDecoration(
-                                color: color,
+                                color: noColor != null ? noColor : color,
                                 borderRadius: BorderRadius.circular(10),
                                 boxShadow: [
                                   BoxShadow(
@@ -445,11 +462,11 @@ class UtilityService {
                               ),
                               child: Center(
                                 child: Text(
-                                  'No',
+                                  noLabel != null ? noLabel : 'No',
                                   style: TextStyle(
                                       decoration: TextDecoration.none,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w500,
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w300,
                                       color: Colors.white),
                                 ),
                               ),
@@ -466,18 +483,16 @@ class UtilityService {
         });
   }
 
-
-
-  void singleButtonConfirmation(
-      {String title,
-        String message,
-        BuildContext context,
-        Function onYes,
-        Color color,
-        String buttonLabel,
-        double buttonHeight,
-        double buttonWidth,
-      }) {
+  void singleButtonConfirmation({
+    String title,
+    String message,
+    BuildContext context,
+    Function onYes,
+    Color color,
+    String buttonLabel,
+    double buttonHeight,
+    double buttonWidth,
+  }) {
     showDialog(
         context: context,
         builder: (context) {
@@ -534,7 +549,7 @@ class UtilityService {
                                 color: Colors.black,
                                 decoration: TextDecoration.none,
                               ),
-                              textAlign:TextAlign.center,
+                              textAlign: TextAlign.center,
                             ),
                           ),
                         ),
@@ -546,8 +561,8 @@ class UtilityService {
                         child: GestureDetector(
                           onTap: onYes,
                           child: Container(
-                            height: buttonHeight!= null ? buttonHeight : 35,
-                            width: buttonWidth!= null ? buttonWidth :64,
+                            height: buttonHeight != null ? buttonHeight : 35,
+                            width: buttonWidth != null ? buttonWidth : 64,
                             decoration: BoxDecoration(
                               color: color,
                               borderRadius: BorderRadius.circular(10),
@@ -561,7 +576,7 @@ class UtilityService {
                             ),
                             child: Center(
                               child: Text(
-                                buttonLabel!=null ? buttonLabel :'Yes',
+                                buttonLabel != null ? buttonLabel : 'Yes',
                                 style: TextStyle(
                                     decoration: TextDecoration.none,
                                     fontSize: 18,
@@ -581,17 +596,16 @@ class UtilityService {
         });
   }
 
-
-  void messageContent(
-      {String title,
-        String message,
-        BuildContext context,
-        Function onYes,
-        Color color,
-        String buttonLabel,
-        double buttonHeight,
-        double buttonWidth,
-      }) {
+  void messageContent({
+    String title,
+    String message,
+    BuildContext context,
+    Function onYes,
+    Color color,
+    String buttonLabel,
+    double buttonHeight,
+    double buttonWidth,
+  }) {
     showDialog(
         context: context,
         builder: (context) {
@@ -604,7 +618,7 @@ class UtilityService {
                   height: 200,
                   width: 400,
                   decoration: BoxDecoration(
-                    color:Colors.grey.shade700,
+                    color: Colors.grey.shade700,
                     borderRadius: BorderRadius.circular(10),
                     // boxShadow: [
                     //   BoxShadow(
@@ -618,7 +632,7 @@ class UtilityService {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only( left: 15,right: 15),
+                        padding: const EdgeInsets.only(left: 15, right: 15),
                         child: Container(
                           //alignment: Alignment.center,
                           child: Center(
@@ -628,10 +642,10 @@ class UtilityService {
                                 fontSize: 16,
                                 wordSpacing: 1.4,
                                 fontWeight: FontWeight.w400,
-                                color:Colors.white,
+                                color: Colors.white,
                                 decoration: TextDecoration.none,
                               ),
-                              textAlign:TextAlign.justify,
+                              textAlign: TextAlign.justify,
                             ),
                           ),
                         ),
@@ -644,7 +658,4 @@ class UtilityService {
           );
         });
   }
-
-
-
 }
