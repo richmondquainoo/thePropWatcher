@@ -215,7 +215,7 @@ class _ScanState extends State<ScanScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: new AppBar(
-        title: new Text('QR Code'),
+        title: new Text('Verify Plan Location'),
       ),
       body: new Stack(
         children: <Widget>[

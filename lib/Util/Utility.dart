@@ -11,9 +11,10 @@ class UtilityService {
           return Flash(
             controller: controller,
             position: FlashPosition.bottom,
+            behavior: FlashBehavior.floating,
             child: FlashBar(
               icon: icon,
-              message: Text(
+              content: Text(
                 message,
                 style: TextStyle(color: Colors.black),
               ),
@@ -369,7 +370,7 @@ class UtilityService {
                           child: Text(
                             title,
                             style: GoogleFonts.lato(
-                                fontSize: 18,
+                                fontSize: 15,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black,
                                 decoration: TextDecoration.none),
@@ -385,7 +386,7 @@ class UtilityService {
                         endIndent: 30,
                       ),
                       SizedBox(
-                        height: 10,
+                        height: 5,
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(
@@ -396,9 +397,9 @@ class UtilityService {
                             child: Text(
                               message,
                               style: GoogleFonts.lato(
-                                fontSize: 15,
+                                fontSize: 12,
                                 wordSpacing: 1,
-                                fontWeight: FontWeight.w400,
+                                fontWeight: FontWeight.w300,
                                 color: Colors.black,
                                 decoration: TextDecoration.none,
                               ),
@@ -423,7 +424,7 @@ class UtilityService {
                                 borderRadius: BorderRadius.circular(10),
                                 boxShadow: [
                                   BoxShadow(
-                                    offset: Offset(0.4, 0.5),
+                                    offset: Offset(0.2, 0.2),
                                     spreadRadius: 0.2,
                                     blurRadius: 0.2,
                                   )
@@ -454,7 +455,7 @@ class UtilityService {
                                 borderRadius: BorderRadius.circular(10),
                                 boxShadow: [
                                   BoxShadow(
-                                    offset: Offset(0.4, 0.5),
+                                    offset: Offset(0.2, 0.2),
                                     spreadRadius: 0.2,
                                     blurRadius: 0.2,
                                   )

@@ -28,6 +28,7 @@ import 'package:provider/provider.dart';
 
 import 'Login/login.dart';
 import 'TrackJob/TrackJobScreen.dart';
+import 'VerifySite/VerifySiteScreen.dart';
 import 'aboutUs.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -238,8 +239,8 @@ class _MyHomePageState extends State<MyHomePage> {
                           ),
                           Container(
                             child: Text(
-                              "Verify Title Certificate",
-                              maxLines: 1,
+                              "Verify \nTitle Certificate",
+                              maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: GoogleFonts.lato(
                                 fontSize: 12,
@@ -294,8 +295,8 @@ class _MyHomePageState extends State<MyHomePage> {
                           ),
                           Container(
                             child: Text(
-                              "Verify Rateable Values",
-                              maxLines: 1,
+                              "Verify Rateable\nValues",
+                              maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: GoogleFonts.lato(
                                 fontSize: 12,
@@ -337,7 +338,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       color: Colors.white,
                     ),
                     child: Padding(
-                      padding: const EdgeInsets.only(left: 10),
+                      padding: const EdgeInsets.only(left: 15),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
@@ -349,7 +350,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             ),
                           ),
                           SizedBox(
-                            width: 5,
+                            width: 10,
                           ),
                           Container(
                             child: Text(
@@ -376,12 +377,18 @@ class _MyHomePageState extends State<MyHomePage> {
               Expanded(
                 child: GestureDetector(
                   onTap: () {
-                    new UtilityService().showMessage(
-                      context: context,
-                      message: 'Service unavailable at the moment.',
-                      icon: Icon(
-                        Icons.error_outline,
-                        color: Colors.red,
+                    // new UtilityService().showMessage(
+                    //   context: context,
+                    //   message: 'Service unavailable at the moment.',
+                    //   icon: Icon(
+                    //     Icons.error_outline,
+                    //     color: Colors.red,
+                    //   ),
+                    // );
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => VerifySiteScreen(),
                       ),
                     );
                   },

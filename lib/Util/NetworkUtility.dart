@@ -6,7 +6,8 @@ import 'package:http/http.dart';
 class NetworkUtility {
   Future<Response> getData(String url) async {
     try {
-      Response response = await http.get(url);
+      var uri = Uri.parse(url);
+      Response response = await http.get(uri);
       return response;
     } catch (e) {
       print('Network Service Error: ${e.toString()}');
@@ -15,21 +16,22 @@ class NetworkUtility {
   }
 
   Future<Response> getDataWithAuth({String url, String auth}) async {
+    var uri = Uri.parse(url);
     Map<String, String> headers = {HttpHeaders.authorizationHeader: auth};
     try {
-      Response response = await http.get(url, headers: headers);
+      Response response = await http.get(uri, headers: headers);
       return response;
     } catch (e) {
       print('Network Service Error: ${e.toString()}');
       return null;
     }
-
   }
 
   Future<Response> postData({String url, String body}) async {
     Map<String, String> headers = {"Content-type": "application/json"};
+    var uri = Uri.parse(url);
     try {
-      Response response = await http.post(url, headers: headers, body: body);
+      Response response = await http.post(uri, headers: headers, body: body);
       return response;
     } catch (e) {
       print('Network Service Error: ${e.toString()}');
@@ -39,12 +41,13 @@ class NetworkUtility {
 
   Future<Response> postDataWithAuth(
       {String url, String body, String auth}) async {
+    var uri = Uri.parse(url);
     Map<String, String> headers = {
       "Content-type": "application/json",
       HttpHeaders.authorizationHeader: auth
     };
     try {
-      Response response =  await http.post(url, headers: headers, body: body);
+      Response response = await http.post(uri, headers: headers, body: body);
       return response;
     } catch (e) {
       print('Network Service Error: ${e.toString()}');

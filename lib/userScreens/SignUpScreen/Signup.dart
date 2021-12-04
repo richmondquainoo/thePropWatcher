@@ -1,9 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:elandguard/Component/FormDropDown.dart';
 import 'package:elandguard/Component/ProgressDialog.dart';
 import 'package:elandguard/Component/TextButtonComponent.dart';
 import 'package:elandguard/Constants/myColors.dart';
+import 'package:elandguard/Util/Constants.dart';
 import 'package:elandguard/Util/NetworkUtility.dart';
 import 'package:elandguard/Util/Utility.dart';
 import 'package:elandguard/Util/paths.dart';
@@ -34,7 +36,7 @@ class _SignUpState extends State<SignUp> {
   String phone;
   String password;
   String passwordConfirm;
-
+  String country;
   File imageFile;
   final picker = ImagePicker();
   String base64Image;
@@ -198,41 +200,63 @@ class _SignUpState extends State<SignUp> {
                 height: 10,
               ),
               Container(
-                height: 48,
                 margin: EdgeInsets.all(5),
                 padding: EdgeInsets.only(left: 5),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.all(
                       Radius.circular(10.0)), // set rounded corner radius
                 ),
-                child: Center(
-                  child: TextField(
-                    style: TextStyle(color: Colors.black87),
-                    controller: phoneController,
-                    onChanged: (value) {
-                      phone = value;
-                    },
-                    decoration: InputDecoration(
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide:
-                            const BorderSide(color: Colors.black87, width: 0.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      flex: 1,
+                      child: AppDropdownInput(
+                        hintText: '',
+                        options: COUNTRY_CODE,
+                        value: country,
+                        onChanged: (String value) {
+                          setState(() {
+                            country = value;
+                          });
+                        },
+                        getLabel: (String value) => value,
                       ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(10)),
-                        borderSide:
-                            const BorderSide(color: kPrimaryTheme, width: 0.7),
-                      ),
-                      prefixIcon: Icon(
-                        Icons.phone,
-                        color: Colors.black54,
-                      ),
-                      hintText: 'Phone',
-                      hintStyle: TextStyle(fontSize: 17, color: Colors.black54),
-                      border: InputBorder.none,
                     ),
-                  ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Expanded(
+                      flex: 3,
+                      child: TextField(
+                        style: TextStyle(color: Colors.black87),
+                        controller: phoneController,
+                        onChanged: (value) {
+                          phone = value;
+                        },
+                        decoration: InputDecoration(
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: const BorderSide(
+                                color: Colors.black87, width: 0.0),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(10)),
+                            borderSide: const BorderSide(
+                                color: kPrimaryTheme, width: 0.7),
+                          ),
+                          prefixIcon: Icon(
+                            Icons.phone,
+                            color: Colors.black54,
+                          ),
+                          hintText: 'Phone',
+                          hintStyle:
+                              TextStyle(fontSize: 17, color: Colors.black54),
+                          border: InputBorder.none,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               SizedBox(

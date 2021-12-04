@@ -66,7 +66,7 @@ class _TrackJobScreenState extends State<TrackJobScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
-                      'Please enter Job Number below.',
+                      'Please enter a Lands Commission Job Number below.',
                       style: GoogleFonts.lato(),
                     ),
                     SizedBox(
@@ -111,7 +111,7 @@ class _TrackJobScreenState extends State<TrackJobScreen> {
                               Icons.edit_outlined,
                               color: Colors.black54,
                             ),
-                            hintText: 'Enter Job Number',
+                            hintText: 'Enter Lands Commission Job #',
                             hintStyle: TextStyle(
                               fontSize: 17,
                               color: Colors.black54,
