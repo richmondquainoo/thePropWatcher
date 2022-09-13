@@ -36,6 +36,8 @@ class _SignUpState extends State<SignUp> {
   String passwordConfirm;
 
   File imageFile;
+  CroppedFile croppedFile;
+
   final picker = ImagePicker();
   String base64Image;
 
@@ -114,7 +116,7 @@ class _SignUpState extends State<SignUp> {
                                 source: ImageSource.gallery);
                             print('picker: ${pickedFile}');
                             if (pickedFile != null) {
-                              File croppedFile = await ImageCropper.cropImage(
+                              CroppedFile croppedFile = await ImageCropper().cropImage(
                                 sourcePath: pickedFile.path,
                                 aspectRatioPresets: [
                                   CropAspectRatioPreset.square,
@@ -123,22 +125,24 @@ class _SignUpState extends State<SignUp> {
                                   CropAspectRatioPreset.ratio4x3,
                                   CropAspectRatioPreset.ratio16x9
                                 ],
-                                androidUiSettings: AndroidUiSettings(
-                                  toolbarTitle: 'Cropper',
-                                  toolbarColor: Colors.green[700],
-                                  toolbarWidgetColor: Colors.white,
-                                  activeControlsWidgetColor: Colors.green[700],
-                                  initAspectRatio:
-                                      CropAspectRatioPreset.original,
-                                  lockAspectRatio: false,
-                                ),
-                                iosUiSettings: IOSUiSettings(
-                                  minimumAspectRatio: 1.0,
-                                ),
+                                uiSettings: [
+                                  AndroidUiSettings(
+                                      toolbarTitle: 'Cropper',
+                                      toolbarColor: Colors.deepOrange,
+                                      toolbarWidgetColor: Colors.white,
+                                      initAspectRatio: CropAspectRatioPreset.original,
+                                      lockAspectRatio: false),
+                                  IOSUiSettings(
+                                    title: 'Cropper',
+                                  ),
+                                  WebUiSettings(
+                                    context: context,
+                                  ),
+                                ],
                               );
                               if (croppedFile != null) {
                                 setState(() {
-                                  imageFile = croppedFile;
+                                  croppedFile = croppedFile;
                                 });
                                 encodeImage();
                               }

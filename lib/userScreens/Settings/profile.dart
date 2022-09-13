@@ -21,6 +21,7 @@ class _GirliesProfileState extends State<GirliesProfile> {
 
 
   File imageFile;
+  CroppedFile croppedFile;
   final picker = ImagePicker();
 
   @override
@@ -97,7 +98,8 @@ class _GirliesProfileState extends State<GirliesProfile> {
                                         await picker.getImage(source: ImageSource.gallery);
                                         print('picker: ${pickedFile}');
                                         if (pickedFile != null) {
-                                          File croppedFile = await ImageCropper.cropImage(
+
+                                          CroppedFile croppedFile = await ImageCropper().cropImage(
                                             sourcePath: pickedFile.path,
                                             aspectRatioPresets: [
                                               CropAspectRatioPreset.square,
@@ -106,21 +108,24 @@ class _GirliesProfileState extends State<GirliesProfile> {
                                               CropAspectRatioPreset.ratio4x3,
                                               CropAspectRatioPreset.ratio16x9
                                             ],
-                                            androidUiSettings: AndroidUiSettings(
-                                              toolbarTitle: 'Cropper',
-                                              toolbarColor: Colors.green[700],
-                                              toolbarWidgetColor: Colors.white,
-                                              activeControlsWidgetColor: Colors.green[700],
-                                              initAspectRatio: CropAspectRatioPreset.original,
-                                              lockAspectRatio: false,
-                                            ),
-                                            iosUiSettings: IOSUiSettings(
-                                              minimumAspectRatio: 1.0,
-                                            ),
+                                            uiSettings: [
+                                              AndroidUiSettings(
+                                                  toolbarTitle: 'Cropper',
+                                                  toolbarColor: Colors.deepOrange,
+                                                  toolbarWidgetColor: Colors.white,
+                                                  initAspectRatio: CropAspectRatioPreset.original,
+                                                  lockAspectRatio: false),
+                                              IOSUiSettings(
+                                                title: 'Cropper',
+                                              ),
+                                              WebUiSettings(
+                                                context: context,
+                                              ),
+                                            ],
                                           );
                                           if (croppedFile != null){
                                             setState(() {
-                                              imageFile = croppedFile;
+                                              croppedFile = croppedFile;
 
                                             });
                                             print('imageFile: $imageFile');
