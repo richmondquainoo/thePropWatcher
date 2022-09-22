@@ -10,6 +10,8 @@ import 'package:elandguard/model/ApplicationDetailsModel.dart';
 import 'package:elandguard/model/MilestoneModel.dart';
 import 'package:elandguard/model/TrackJobModel.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart';
 
@@ -57,73 +59,126 @@ class _TrackJobScreenState extends State<TrackJobScreen> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.only(left: 10, right: 10, top: 10),
+          padding: const EdgeInsets.only(
+            left: 10,
+            right: 10,
+          ),
           child: Column(
             children: [
+              Divider(),
               Padding(
-                padding: const EdgeInsets.only(left: 10, right: 10),
+                padding: const EdgeInsets.only(
+                  left: 10,
+                  right: 10,
+                  top: 10,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
-                      'Please enter a Lands Commission Job Number below.',
+                      'Please enter a Lands Commission Job Number below. You can also scan the job number using the Scan QR Code button below.',
                       style: GoogleFonts.lato(),
                     ),
                     SizedBox(
-                      height: 10,
+                      height: 20,
                     ),
-                    Divider(
-                      thickness: 0.5,
-                    ),
-                    Container(
-                      height: 48,
-                      margin: EdgeInsets.all(5),
-                      padding: EdgeInsets.only(left: 5),
-                      decoration: BoxDecoration(
-                        // set border width
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(10.0),
-                        ),
-                      ),
-                      child: Center(
-                        child: TextField(
-                          style: TextStyle(color: Colors.black54),
-                          controller: controller,
-                          onChanged: (value) {
-                            setState(() {
-                              controller.text.toUpperCase();
-                              print(controller.text.toUpperCase());
-                            });
-                          },
-                          decoration: InputDecoration(
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: const BorderSide(
-                                  color: Colors.black87, width: 0.0),
+                    // Divider(
+                    //   thickness: 0.5,
+                    // ),
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 3,
+                          child: Container(
+                            margin: EdgeInsets.all(1),
+                            padding: EdgeInsets.all(5),
+                            decoration: BoxDecoration(
+                              // set border width
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(10.0),
+                              ),
                             ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(10)),
-                              borderSide: const BorderSide(
-                                  color: kPrimaryTheme, width: 0.7),
+                            child: Center(
+                              child: TextField(
+                                style: TextStyle(color: Colors.black54),
+                                controller: controller,
+                                onChanged: (value) {
+                                  setState(() {
+                                    controller.text.toUpperCase();
+                                    print(controller.text.toUpperCase());
+                                  });
+                                },
+                                decoration: InputDecoration(
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: const BorderSide(
+                                        color: Colors.black87, width: 0.0),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(10)),
+                                    borderSide: const BorderSide(
+                                        color: kPrimaryTheme, width: 0.7),
+                                  ),
+                                  prefixIcon: Icon(
+                                    Icons.edit_outlined,
+                                    color: Colors.black54,
+                                  ),
+                                  hintText: 'Enter Job #',
+                                  hintStyle: TextStyle(
+                                    fontSize: 17,
+                                    color: Colors.black54,
+                                  ),
+                                  border: InputBorder.none,
+                                ),
+                              ),
                             ),
-                            prefixIcon: Icon(
-                              Icons.edit_outlined,
-                              color: Colors.black54,
-                            ),
-                            hintText: 'Enter Lands Commission Job #',
-                            hintStyle: TextStyle(
-                              fontSize: 17,
-                              color: Colors.black54,
-                            ),
-                            border: InputBorder.none,
                           ),
                         ),
-                      ),
+                        Expanded(
+                          child: Column(
+                            children: [
+                              GestureDetector(
+                                onTap: () async {
+                                  String barcodeScanRes;
+                                  try {
+                                    barcodeScanRes =
+                                        await FlutterBarcodeScanner.scanBarcode(
+                                            '#ff6666',
+                                            'Cancel',
+                                            true,
+                                            ScanMode.QR);
+                                    print(barcodeScanRes);
+                                    if (barcodeScanRes != "-1") {
+                                      setState(() {
+                                        controller.text = barcodeScanRes;
+                                        controller.text.toUpperCase();
+                                      });
+                                    }
+                                  } on PlatformException {
+                                    barcodeScanRes =
+                                        'Failed to get platform version.';
+                                  }
+                                },
+                                child: Icon(
+                                  Icons.qr_code,
+                                  size: 28,
+                                ),
+                              ),
+                              Text(
+                                'Scan QR Code',
+                                style: GoogleFonts.lato(
+                                  fontSize: 10,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
-                    Divider(
-                      thickness: 0.5,
-                    ),
+                    // Divider(
+                    //   thickness: 0.5,
+                    // ),
                     SizedBox(
                       height: 30,
                     ),
@@ -139,8 +194,8 @@ class _TrackJobScreenState extends State<TrackJobScreen> {
                                   'Are you sure you want to track job details?.',
                               context: context,
                               yesColor: Colors.teal,
-                              yesLabel: 'Yes, Proceed',
-                              noLabel: 'No, Cancel',
+                              yesLabel: 'Proceed',
+                              noLabel: 'Cancel',
                               noColor: Colors.deepOrange,
                               buttonHeight: 30,
                               buttonWidth: 100,
@@ -231,50 +286,63 @@ class _TrackJobScreenState extends State<TrackJobScreen> {
             context: context,
           );
         } else {
-          ApplicationDetailsModel details = ApplicationDetailsModel(
-            client_name:
-                data['application_details'][0]['client_name'].toString(),
-            case_number:
-                data['application_details'][0]['case_number'].toString(),
-            job_status: data['application_details'][0]['job_status'].toString(),
-            created_date:
-                data['application_details'][0]['created_date'].toString(),
-            modified_date:
-                data['application_details'][0]['modified_date'].toString(),
-            business_process_name: data['application_details'][0]
-                    ['business_process_name']
-                .toString(),
-            business_process_sub_name: data['application_details'][0]
-                    ['business_process_sub_name']
-                .toString(),
-            application_stage:
-                data['application_details'][0]['application_stage'].toString(),
-          );
-          List<MilestoneModel> mod = [];
-          var milestones = data['milestones'] as List;
-          if (milestones.isNotEmpty) {
-            for (int i = 0; i < milestones.length; i++) {
-              MilestoneModel m = MilestoneModel(
-                // ms_id: data['milestones'][i]['ms_id'],
-                mile_stone_status: data['milestones'][i]['mile_stone_status'],
-                milestone_description: data['milestones'][i]
-                    ['milestone_description'],
-                // working_day_required: data['milestones'][i]['working_day_required'],
-                // milestone_remaining: data['milestones'][i]['milestone_remaining'],
-              );
-              mod.add(m);
+          if (data['application_details'] != null) {
+            ApplicationDetailsModel details = ApplicationDetailsModel(
+              client_name:
+                  data['application_details'][0]['client_name'].toString(),
+              case_number:
+                  data['application_details'][0]['case_number'].toString(),
+              job_status:
+                  data['application_details'][0]['job_status'].toString(),
+              created_date:
+                  data['application_details'][0]['created_date'].toString(),
+              modified_date:
+                  data['application_details'][0]['modified_date'].toString(),
+              business_process_name: data['application_details'][0]
+                      ['business_process_name']
+                  .toString(),
+              business_process_sub_name: data['application_details'][0]
+                      ['business_process_sub_name']
+                  .toString(),
+              application_stage: data['application_details'][0]
+                      ['application_stage']
+                  .toString(),
+            );
+            List<MilestoneModel> mod = [];
+            var milestones = data['milestones'] as List;
+            if (milestones.isNotEmpty) {
+              for (int i = 0; i < milestones.length; i++) {
+                MilestoneModel m = MilestoneModel(
+                  // ms_id: data['milestones'][i]['ms_id'],
+                  mile_stone_status: data['milestones'][i]['mile_stone_status'],
+                  milestone_description: data['milestones'][i]
+                      ['milestone_description'],
+                  // working_day_required: data['milestones'][i]['working_day_required'],
+                  // milestone_remaining: data['milestones'][i]['milestone_remaining'],
+                );
+                mod.add(m);
+              }
             }
-          }
-          details.milestones = mod;
+            details.milestones = mod;
 
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => JobDetailsScreen(
-                data: details,
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => JobDetailsScreen(
+                  data: details,
+                ),
               ),
-            ),
-          );
+            );
+          } else {
+            new UtilityService().showMessage(
+              context: context,
+              message: 'No data found. Please enter valid job number',
+              icon: Icon(
+                Icons.error_outline,
+                color: Colors.red,
+              ),
+            );
+          }
         }
       }
     } catch (e) {

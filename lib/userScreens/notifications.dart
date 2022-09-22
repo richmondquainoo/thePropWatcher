@@ -17,7 +17,7 @@ class _GirliesNotificationsState extends State<GirliesNotifications> {
       ),
       body: new Center(
         child: new Text(
-          "My Notfications",
+          "My Notifications",
           style: new TextStyle(fontSize: 25.0),
         ),
       ),

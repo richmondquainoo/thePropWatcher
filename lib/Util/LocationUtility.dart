@@ -51,9 +51,14 @@ class LocationUtilityService {
           'Location permissions are permanently denied, we cannot request permissions.');
     }
 
+    var accuracy = await Geolocator.getLocationAccuracy();
+    print('location accuracy: ${accuracy.name}');
+
     // When we reach here, permissions are granted and we can
     // continue accessing the position of the device.
-    return await Geolocator.getCurrentPosition();
+    return await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.bestForNavigation,
+    );
   }
 
   void displayRationale(context) {

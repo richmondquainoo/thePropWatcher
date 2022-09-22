@@ -39,7 +39,7 @@ class _VerifySiteScreenState extends State<VerifySiteScreen> {
         backgroundColor: kBackgroundTheme,
         elevation: 0,
         title: Text(
-          "Verify Site",
+          "Plot Site Boundaries",
           style: TextStyle(
               fontSize: 18, fontWeight: FontWeight.w600, color: kPrimaryTheme),
         ),
@@ -69,7 +69,7 @@ class _VerifySiteScreenState extends State<VerifySiteScreen> {
                       height: 10,
                     ),
                     Text(
-                      'To verify a site, please take note of the following:'
+                      'To plot site boundaries, please take note of the following:'
                       '\n1. Please pick the GPS coordinates of the site. '
                       '\n2. Please ensure location access permission is granted. '
                       '\n3. Please ensure your location is turned on.'
@@ -78,6 +78,19 @@ class _VerifySiteScreenState extends State<VerifySiteScreen> {
                       style: GoogleFonts.montserrat(
                         fontSize: 12,
                         fontWeight: FontWeight.w300,
+                      ),
+                      textAlign: TextAlign.justify,
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      'To record the boundaries, go to each boundary point(typically, the corner of the boundary) then click on the plus '
+                      'sign to add that point to the list of coordinates for the boundary, then proceed to the next point and do same until '
+                      'you have plotted all the corners of your plot. You need to add at lease 4 different coordinates.',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
                       ),
                       textAlign: TextAlign.justify,
                     ),
@@ -277,6 +290,7 @@ class _VerifySiteScreenState extends State<VerifySiteScreen> {
   Future<void> addLocation(BuildContext context) async {
     try {
       showDialog(
+        barrierDismissible: true,
         context: context,
         builder: (context) {
           return ProgressDialog(displayMessage: 'Obtaining coordinates...');
@@ -307,6 +321,15 @@ class _VerifySiteScreenState extends State<VerifySiteScreen> {
               Navigator.pop(context);
             });
       }
+      // else if (position.accuracy > 10) {
+      //   while (position.accuracy > 10) {
+      //     position = await new LocationUtilityService().getCurrentLocation();
+      //   }
+      // } else {
+      //   setState(() {
+      //     positions.add(position);
+      //   });
+      // }
       if (position.accuracy > 100) {
         new UtilityService().confirmationBox(
             title: 'Location Accuracy High',
@@ -375,8 +398,8 @@ class _VerifySiteScreenState extends State<VerifySiteScreen> {
                           'Are you sure you want to remove this coordinate?',
                       context: context,
                       yesColor: Colors.teal,
-                      yesLabel: 'Yes, Remove',
-                      noLabel: 'No, Cancel',
+                      yesLabel: 'Remove',
+                      noLabel: 'Cancel',
                       noColor: Colors.deepOrange,
                       buttonHeight: 30,
                       buttonWidth: 100,

@@ -48,7 +48,7 @@ class _GirliesAboutUsState extends State<GirliesAboutUs> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       Image.asset(
-                        'assets/images/splash.png',
+                        'assets/images/propWatch.png',
                         height: 150,
                       ),
                       Padding(

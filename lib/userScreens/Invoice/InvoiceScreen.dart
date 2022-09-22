@@ -21,18 +21,20 @@ import 'package:uuid/uuid.dart';
 
 class InvoiceScreen extends StatefulWidget {
   final ServiceChargeModel serviceChargeModel;
+  final requestObject;
 
-  InvoiceScreen({this.serviceChargeModel});
+  InvoiceScreen({this.serviceChargeModel, this.requestObject});
 
   @override
-  _InvoiceScreenState createState() =>
-      _InvoiceScreenState(serviceChargeModel: serviceChargeModel);
+  _InvoiceScreenState createState() => _InvoiceScreenState(
+      serviceChargeModel: serviceChargeModel, requestObject: requestObject);
 }
 
 class _InvoiceScreenState extends State<InvoiceScreen> {
   final ServiceChargeModel serviceChargeModel;
+  final requestObject;
 
-  _InvoiceScreenState({this.serviceChargeModel});
+  _InvoiceScreenState({this.serviceChargeModel, this.requestObject});
 
   var uuid = Uuid();
   String uuidGen;
@@ -219,7 +221,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                               null)
                                       ? serviceChargeModel.serviceName
                                       : '-',
-                                  style: GoogleFonts.robotoMono(
+                                  style: GoogleFonts.lato(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w300,
                                     // color: Colors.pink,
@@ -236,7 +238,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                           serviceChargeModel.amount != null)
                                       ? '${serviceChargeModel.amount.toStringAsFixed(2)}'
                                       : '-',
-                                  style: GoogleFonts.robotoMono(
+                                  style: GoogleFonts.lato(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w300,
                                   ),
@@ -260,7 +262,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                 flex: 3,
                                 child: Text(
                                   'Tax',
-                                  style: GoogleFonts.robotoMono(
+                                  style: GoogleFonts.lato(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w300,
                                     // color: Colors.pink,
@@ -277,7 +279,48 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                           serviceChargeModel.tax != null)
                                       ? '${serviceChargeModel.tax.toStringAsFixed(2)}'
                                       : '-',
-                                  style: GoogleFonts.robotoMono(
+                                  style: GoogleFonts.lato(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w300,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        //
+                      ],
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Row(
+                            children: [
+                              Expanded(
+                                flex: 3,
+                                child: Text(
+                                  'Levy',
+                                  style: GoogleFonts.lato(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w300,
+                                    // color: Colors.pink,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                width: 5,
+                              ),
+                              Expanded(
+                                flex: 1,
+                                child: Text(
+                                  (serviceChargeModel != null &&
+                                          serviceChargeModel.levy != null)
+                                      ? '${serviceChargeModel.levy.toStringAsFixed(2)}'
+                                      : '-',
+                                  style: GoogleFonts.lato(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w300,
                                   ),
@@ -304,7 +347,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                 flex: 3,
                                 child: Text(
                                   'Total',
-                                  style: GoogleFonts.robotoMono(
+                                  style: GoogleFonts.lato(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w500,
                                     // color: Colors.pink,
@@ -319,10 +362,11 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                 child: Text(
                                   (serviceChargeModel != null &&
                                           serviceChargeModel.amount != null &&
-                                          serviceChargeModel.tax != null)
-                                      ? '${(serviceChargeModel.amount + serviceChargeModel.tax).toStringAsFixed(2)}'
+                                          serviceChargeModel.tax != null &&
+                                          serviceChargeModel.levy != null)
+                                      ? '${(serviceChargeModel.amount + serviceChargeModel.tax + serviceChargeModel.levy).toStringAsFixed(2)}'
                                       : '-',
-                                  style: GoogleFonts.robotoMono(
+                                  style: GoogleFonts.lato(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w500,
                                   ),
@@ -416,6 +460,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
       totalAmount: serviceChargeModel.amount + serviceChargeModel.tax,
       invoiceNo: invoiceNum,
       origin: 'Phone_App',
+      requestObject: requestObject.toString(),
     );
     proceedToPayment(context: context, invoiceModel: model);
   }
@@ -476,6 +521,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
             MaterialPageRoute(
               builder: (context) => Payment(
                 invoiceModel: invoiceModel,
+                requestObject: requestObject.toString(),
               ),
             ),
           );

@@ -155,6 +155,7 @@ class _SetProfileScreenState extends State<SetProfileScreen> {
                       ),
                       child: Center(
                         child: TextField(
+                          obscureText: false,
                           style: TextStyle(color: Colors.black),
                           controller: confirmController,
                           onChanged: (value) {
@@ -215,6 +216,7 @@ class _SetProfileScreenState extends State<SetProfileScreen> {
     UserProfileModel model = UserProfileModel(
       email: otpModel.email,
       password: confirmController.text,
+      phone: otpModel.phone,
     );
     await dbImplementation.saveUser(model);
     new UtilityService().confirmationBox(

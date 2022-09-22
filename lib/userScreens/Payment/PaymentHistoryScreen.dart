@@ -1,5 +1,6 @@
 import 'package:elandguard/Constants/myColors.dart';
 import 'package:elandguard/model/InvoiceModel.dart';
+import 'package:elandguard/userScreens/Payment/PaymentDetailsScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -88,30 +89,46 @@ class _PaymentHistoryScreenState extends State<PaymentHistoryScreen> {
     List<ListTile> li = [];
     if (list.isNotEmpty) {
       for (InvoiceModel inv in list) {
+        String date = '-';
+        if (inv.paymentDate != null) {
+          date = inv.paymentDate.substring(0, 10);
+        }
         li.add(ListTile(
           title: Text(
             'Service: ${inv.serviceName}',
             style: GoogleFonts.lato(),
           ),
           subtitle: Text(
-            'Payment Date: ${inv.paymentDate} | Status: ${inv.status}',
+            'Date: $date | Amt: GHS ${inv.paymentAmount.toStringAsFixed(2)} | Status: ${inv.status}',
             style: GoogleFonts.lato(
               fontSize: 10,
               color: Colors.black54,
             ),
           ),
-          trailing: Container(
-            decoration: BoxDecoration(
-              color: (inv.status != null && inv.status == 'Paid')
-                  ? Colors.teal
-                  : Colors.deepOrange,
-              borderRadius: BorderRadius.circular(5),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Text(
-                'GHS ${inv.paymentAmount}',
-                style: GoogleFonts.montserrat(color: Colors.white),
+          trailing: GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PaymentDetailsScreen(
+                    model: inv,
+                  ),
+                ),
+              );
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                color: (inv.status != null && inv.status == 'Paid')
+                    ? Colors.teal
+                    : Colors.deepOrange,
+                borderRadius: BorderRadius.circular(5),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(9.0),
+                child: Text(
+                  'View Details',
+                  style: GoogleFonts.montserrat(color: Colors.white),
+                ),
               ),
             ),
           ),

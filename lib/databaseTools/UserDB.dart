@@ -17,7 +17,9 @@ class UserDB {
           "name TEXT, "
           "password TEXT, "
           "phone TEXT, "
-          "email TEXT "
+          "email TEXT, "
+          "country TEXT, "
+          "loggedIn TEXT "
           ")",
         );
       },
@@ -75,6 +77,8 @@ class UserDB {
             password: maps[i]['password'],
             phone: maps[i]['phone'],
             email: maps[i]['email'],
+            country: maps[i]['country'],
+            loggedIn: maps[i]['loggedIn'],
           );
         },
       );
@@ -85,13 +89,13 @@ class UserDB {
   }
 
   Future<UserProfileModel> authenticateUser(
-      String email, String password) async {
+      String phone, String password) async {
     try {
       final Database db = await database;
 
       // Query the obj
       final List<Map<String, dynamic>> maps = await db.rawQuery(
-          'select * from land where email=\'$email\' and password=\'$password\'');
+          'select * from land where phone=\'$phone\' and password=\'$password\'');
       return List.generate(
         maps.length,
         (i) {
@@ -103,6 +107,8 @@ class UserDB {
             password: maps[i]['password'],
             phone: maps[i]['phone'],
             email: maps[i]['email'],
+            country: maps[i]['country'],
+            loggedIn: maps[i]['loggedIn'],
           );
         },
       ).first;
@@ -130,6 +136,8 @@ class UserDB {
             password: maps[i]['password'],
             phone: maps[i]['phone'],
             email: maps[i]['email'],
+            country: maps[i]['country'],
+            loggedIn: maps[i]['loggedIn'],
           );
         },
       ).first;
@@ -157,6 +165,8 @@ class UserDB {
             password: maps[i]['password'],
             phone: maps[i]['phone'],
             email: maps[i]['email'],
+            country: maps[i]['country'],
+            loggedIn: maps[i]['loggedIn'],
           );
         },
       ).first;
@@ -184,11 +194,13 @@ class UserDB {
             phone: maps[i]['phone'],
             password: maps[i]['password'],
             email: maps[i]['email'],
+            country: maps[i]['country'],
+            loggedIn: maps[i]['loggedIn'],
           );
         },
       ).first;
     } catch (e) {
-      print('Fetch Error(getUserByProfile): $e');
+      print('Fetch Error(getUserBypicture): $e');
       return null;
     }
   }

@@ -257,8 +257,9 @@ class UtilityService {
                           ),
                         ),
                       ),
+                      Divider(),
                       SizedBox(
-                        height: 30,
+                        height: 20,
                       ),
                       Padding(
                         padding: const EdgeInsets.only(left: 15),

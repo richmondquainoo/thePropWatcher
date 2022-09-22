@@ -18,6 +18,7 @@ import 'package:elandguard/userScreens/myHomePage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart';
+import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -26,12 +27,12 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  var emailController = TextEditingController();
+  var phoneController = TextEditingController();
   var passwordController = TextEditingController();
 
-  String email;
+  String ph = '';
   String password;
-
+  bool checked = true;
   final scaffoldKey = new GlobalKey<ScaffoldState>();
 
   @override
@@ -50,7 +51,7 @@ class _LoginScreenState extends State<LoginScreen> {
               Container(
                 alignment: Alignment.center,
                 child: Image.asset(
-                  'assets/images/splash.png',
+                  'assets/images/propWatch.png',
                   width: 240.0,
                   height: 150.0,
                 ),
@@ -58,23 +59,25 @@ class _LoginScreenState extends State<LoginScreen> {
                 height: 200.0,
               ),
               Container(
-                height: 48,
+                height: 70,
                 margin: EdgeInsets.all(5),
                 padding: EdgeInsets.only(left: 5),
                 decoration: BoxDecoration(
                   // set border width
                   borderRadius: BorderRadius.all(
-                    Radius.circular(10.0),
+                    Radius.circular(5.0),
                   ),
                 ),
                 child: Center(
-                  child: TextField(
-                    style: TextStyle(color: Colors.black54),
-                    controller: emailController,
-                    onChanged: (value) {
-                      email = value;
-                    },
-                    decoration: InputDecoration(
+                  child: InternationalPhoneNumberInput(
+                    keyboardType: TextInputType.phone,
+                    hintText: 'Phone number',
+                    initialValue: PhoneNumber(dialCode: '+233', isoCode: 'GH'),
+                    textFieldController: phoneController,
+                    keyboardAction: TextInputAction.done,
+                    textStyle: TextStyle(color: Colors.black87),
+                    maxLength: 15,
+                    inputDecoration: InputDecoration(
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                         borderSide:
@@ -87,16 +90,20 @@ class _LoginScreenState extends State<LoginScreen> {
                             const BorderSide(color: kPrimaryTheme, width: 0.7),
                       ),
                       prefixIcon: Icon(
-                        Icons.mail,
+                        Icons.phone,
                         color: Colors.black54,
                       ),
-                      hintText: 'Email Address',
-                      hintStyle: TextStyle(
-                        fontSize: 17,
-                        color: Colors.black54,
-                      ),
+                      hintText: 'Phone number',
+                      hintStyle: TextStyle(fontSize: 15, color: Colors.black54),
                       border: InputBorder.none,
                     ),
+                    spaceBetweenSelectorAndTextField: 2,
+                    onInputChanged: (PhoneNumber value) {
+                      print('phone number ${value.phoneNumber}');
+                      ph = value.phoneNumber;
+                      // country = value.isoCode;
+                      // num = value.phoneNumber;
+                    },
                   ),
                 ),
               ),
@@ -142,7 +149,35 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               SizedBox(
-                height: 20.0,
+                height: 10,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Checkbox(
+                    checkColor: Colors.white,
+                    activeColor: Colors.lightBlue,
+                    value: checked,
+                    onChanged: (bool value) {
+                      setState(() {
+                        checked = value;
+                      });
+                    },
+                  ),
+                  Container(
+                    child: Text(
+                      "Keep me logged in",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w300,
+                      ),
+                      // overflow: TextOverflow.fade,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 10.0,
               ),
               Padding(
                 padding: const EdgeInsets.all(4.0),
@@ -165,10 +200,13 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         );
                       } else {
+                        phoneController.text = ph;
                         UserProfileModel model = UserProfileModel(
-                          email: emailController.text,
-                          password: passwordController.text,
+                          phone: phoneController.text.trim(),
+                          password: passwordController.text.trim(),
                         );
+                        // print(phoneController.text);
+                        // print(ph);
                         serverAuthentication(model);
                       }
                     }
@@ -248,11 +286,19 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<bool> localAuthentication(BuildContext context) async {
     UserDBImplementation imp = UserDBImplementation();
-    UserProfileModel user =
-        await imp.authenticateAgainstLocalDB(email, password);
-    if ((user != null && user.email == email) &&
-        (user != null && user.password == password)) {
+    UserProfileModel user = await imp.authenticateAgainstLocalDB(
+        phoneController.text.trim(), password.trim());
+    if ((user != null && user.phone == phoneController.text.trim()) &&
+        (user != null && user.password == password.trim())) {
+      if (checked) {
+        user.loggedIn = '1';
+      } else {
+        user.loggedIn = '0';
+      }
+      bool updated = await imp.updateUser(user);
+      print('Updated: $updated - $user');
       Provider.of<AppData>(context, listen: false).updateUserData(user);
+      // print('User after update: $user');
       return true;
     } else {
       return false;
@@ -260,12 +306,10 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   bool isValidEntries(BuildContext context) {
-    if (emailController.text.length == 0 ||
-        !emailController.text.contains("@") ||
-        !emailController.text.contains(".")) {
+    if (ph.length < 6) {
       new UtilityService().showMessage(
         context: context,
-        message: 'Please enter valid email',
+        message: 'Please enter valid phone',
         icon: Icon(
           Icons.error_outline,
           color: Colors.red,
@@ -383,7 +427,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
       await userDB.initialize();
       await userDB.deleteAll();
-
+      if (checked) {
+        user.loggedIn = '1';
+      } else {
+        user.loggedIn = '0';
+      }
       await dbImplementation.saveUser(user);
       Provider.of<AppData>(context, listen: false).updateUserData(user);
       Navigator.push(
@@ -465,7 +513,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
 //
 //   verifyLogin() async {
-//     if (emailController.text == "") {
+//     if (phoneController.text == "") {
 //       showSnackBar("Email cannot be empty", scaffoldKey);
 //       return;
 //     }

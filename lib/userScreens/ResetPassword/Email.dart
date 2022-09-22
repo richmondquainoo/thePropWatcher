@@ -12,6 +12,7 @@ import 'package:elandguard/userScreens/OTPScreen/OtpScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart';
+import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 
 class EmailScreen extends StatefulWidget {
   EmailScreen();
@@ -21,8 +22,9 @@ class EmailScreen extends StatefulWidget {
 }
 
 class _EmailScreenState extends State<EmailScreen> {
-  var emailController = TextEditingController();
+  var phoneController = TextEditingController();
   _EmailScreenState();
+  String ph = '';
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +34,7 @@ class _EmailScreenState extends State<EmailScreen> {
         backgroundColor: kBackgroundTheme,
         elevation: 0,
         title: Text(
-          "Enter your email",
+          "Enter your phone number",
           style: TextStyle(
               fontSize: 20, fontWeight: FontWeight.w600, color: kPrimaryTheme),
         ),
@@ -57,7 +59,7 @@ class _EmailScreenState extends State<EmailScreen> {
                 child: Column(
                   children: [
                     Text(
-                      'Please enter the email address you used in creating your account.',
+                      'Please enter the phone number you used in creating your account.',
                       style: GoogleFonts.lato(),
                     ),
                     SizedBox(
@@ -72,12 +74,16 @@ class _EmailScreenState extends State<EmailScreen> {
                             Radius.circular(10.0)), // set rounded corner radius
                       ),
                       child: Center(
-                        child: TextField(
-                          obscureText: false,
-                          style: TextStyle(color: Colors.black),
-                          controller: emailController,
-                          onChanged: (value) {},
-                          decoration: InputDecoration(
+                        child: InternationalPhoneNumberInput(
+                          keyboardType: TextInputType.phone,
+                          hintText: 'Phone number',
+                          initialValue:
+                              PhoneNumber(dialCode: '+233', isoCode: 'GH'),
+                          textFieldController: phoneController,
+                          keyboardAction: TextInputAction.done,
+                          textStyle: TextStyle(color: Colors.black87),
+                          maxLength: 15,
+                          inputDecoration: InputDecoration(
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
                               borderSide: const BorderSide(
@@ -90,14 +96,21 @@ class _EmailScreenState extends State<EmailScreen> {
                                   color: kPrimaryTheme, width: 0.7),
                             ),
                             prefixIcon: Icon(
-                              Icons.email,
+                              Icons.phone,
                               color: Colors.black54,
                             ),
-                            hintText: 'Email',
+                            hintText: 'Phone number',
                             hintStyle:
-                                TextStyle(fontSize: 17, color: Colors.black54),
+                                TextStyle(fontSize: 15, color: Colors.black54),
                             border: InputBorder.none,
                           ),
+                          spaceBetweenSelectorAndTextField: 2,
+                          onInputChanged: (PhoneNumber value) {
+                            print('phone number ${value.phoneNumber}');
+                            ph = value.phoneNumber;
+                            // country = value.isoCode;
+                            // num = value.phoneNumber;
+                          },
                         ),
                       ),
                     ),
@@ -133,7 +146,7 @@ class _EmailScreenState extends State<EmailScreen> {
           return ProgressDialog(displayMessage: 'Please wait...');
         },
       );
-      UserProfileModel model = UserProfileModel(email: emailController.text);
+      UserProfileModel model = UserProfileModel(phone: ph);
       var jsonBody = jsonEncode(model);
       NetworkUtility networkUtility = NetworkUtility();
       Response response = await networkUtility.postDataWithAuth(
@@ -215,12 +228,10 @@ class _EmailScreenState extends State<EmailScreen> {
   }
 
   bool isValidEntries(BuildContext context) {
-    if (emailController.text.length == 0 ||
-        !emailController.text.contains("@") ||
-        !emailController.text.contains(".")) {
+    if (ph.length < 0) {
       new UtilityService().showMessage(
         context: context,
-        message: 'Please enter password',
+        message: 'Please enter valid phone number',
         icon: Icon(
           Icons.error_outline,
           color: Colors.red,

@@ -97,7 +97,7 @@ class _GirliesProfileState extends State<GirliesProfile> {
                                         await picker.getImage(source: ImageSource.gallery);
                                         print('picker: ${pickedFile}');
                                         if (pickedFile != null) {
-                                          File croppedFile = await ImageCropper.cropImage(
+                                          File croppedFile = await ImageCropper().cropImage(
                                             sourcePath: pickedFile.path,
                                             aspectRatioPresets: [
                                               CropAspectRatioPreset.square,

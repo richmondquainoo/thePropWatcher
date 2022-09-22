@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-
 class TextButtonComponent extends StatelessWidget {
   final String label;
   final Function onTap;
@@ -40,7 +39,10 @@ class TextButtonComponent extends StatelessWidget {
             child: Container(
               width: MediaQuery.of(context).size.width,
               alignment: Alignment.center,
-              height: 45,
+              padding: EdgeInsets.symmetric(
+                vertical: 10,
+                horizontal: 15,
+              ),
               decoration: BoxDecoration(
                 color: labelColor != null ? labelColor : Colors.pink,
                 borderRadius: BorderRadius.circular(

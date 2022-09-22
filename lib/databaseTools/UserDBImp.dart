@@ -93,6 +93,22 @@ class UserDBImplementation {
     return null;
   }
 
+  Future<UserProfileModel> getLoggedInUser() async {
+    try {
+      await initializeDB();
+      List<UserProfileModel> users = await userDB.getAllUsers();
+      if (users.isNotEmpty) {
+        if (users.first.loggedIn == '1') {
+          return users.first;
+        }
+      }
+    } catch (e) {
+      print('getUser error: $e');
+      return null;
+    }
+    return null;
+  }
+
   Future<void> deleteAll() async {
     try {
       await initializeDB();

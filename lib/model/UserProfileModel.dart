@@ -6,6 +6,8 @@ class UserProfileModel {
   String password;
   String phone;
   String email;
+  String country;
+  String loggedIn;
 
   UserProfileModel({
     this.id,
@@ -15,6 +17,8 @@ class UserProfileModel {
     this.password,
     this.phone,
     this.email,
+    this.country,
+    this.loggedIn,
   });
 
   Map<String, dynamic> toMap() {
@@ -26,6 +30,8 @@ class UserProfileModel {
       "password": password,
       "phone": phone,
       "email": email,
+      "country": country,
+      "loggedIn": loggedIn,
     };
   }
 
@@ -38,11 +44,13 @@ class UserProfileModel {
       "password": password,
       "phone": phone,
       "email": email,
+      "country": country,
+      "loggedIn": loggedIn,
     };
   }
 
   @override
   String toString() {
-    return 'UserProfileModel{id: $id, picture: $picture, profileName: $profileName, name: $name, password: $password, phone: $phone, email: $email}';
+    return 'UserProfileModel{id: $id, picture: $picture, profileName: $profileName, name: $name, password: $password, phone: $phone, email: $email, country: $country, loggedIn: $loggedIn}';
   }
 }

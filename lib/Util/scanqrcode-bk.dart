@@ -1,7 +1,5 @@
 import 'dart:async';
 
-import 'package:barcode_scan_fix/barcode_scan.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:http/http.dart' as http;
@@ -48,7 +46,7 @@ class _ScanState extends State<ScanScreen> {
   ];
 
   Future<String> sendconvertGNGtoWGS84(String jsonRequest) async {
-    String codeSannernew = await BarcodeScanner.scan(); //barcode scanner
+    String codeSannernew = null; //barcode scanner
 //sendconvertGNGtoWGS84(codeSanner);
 
     final response = await http.post(

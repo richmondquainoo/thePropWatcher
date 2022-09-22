@@ -5,7 +5,6 @@ import 'package:elandguard/Constants/myColors.dart';
 import 'package:elandguard/Util/NetworkUtility.dart';
 import 'package:elandguard/Util/Utility.dart';
 import 'package:elandguard/Util/paths.dart';
-import 'package:elandguard/databaseTools/UserDB.dart';
 import 'package:elandguard/databaseTools/UserDBImp.dart';
 import 'package:elandguard/model/AppData.dart';
 import 'package:elandguard/model/OtpModel.dart';
@@ -19,8 +18,6 @@ import 'package:otp_text_field/otp_field.dart';
 import 'package:otp_text_field/otp_field_style.dart';
 import 'package:otp_text_field/style.dart';
 import 'package:provider/provider.dart';
-
-import '../myHomePage.dart';
 
 class OtpScreen extends StatefulWidget {
   final OTPModel otpModel;
@@ -52,9 +49,9 @@ class _OtpScreenState extends State<OtpScreen> {
     super.initState();
     if (otpModel != null && otpModel.email != null) {
       caption =
-          'Enter the verification code we just sent to your email address '
-          '${otpModel.email.substring(0, 1)}'
-          '***${otpModel.email.substring(otpModel.email.length - 3)}';
+          'Enter the verification code we just sent to your phone number ';
+      // '${otpModel.email.substring(0, 1)}'
+      //     '***${otpModel.email.substring(otpModel.email.length - 3)}'
     }
   }
 
@@ -256,6 +253,8 @@ class _OtpScreenState extends State<OtpScreen> {
           email: otpModel.email,
           phone: otpModel.phone,
           password: password,
+          country: otpModel.country,
+          // picture: encodedImage,
         );
         registerUser(userProfileModel: model, context: context);
       }
@@ -308,7 +307,7 @@ class _OtpScreenState extends State<OtpScreen> {
     int status = data['status'];
     print('body: $data');
     // Handle network error
-    if (status == 500 || status == 404 || status == 403) {
+    if (status == 500 || status == 404 || status == 403 || status == 0) {
       new UtilityService().showMessage(
         message:
             'An error has occurred whiles creating account. Please try again',
@@ -319,49 +318,42 @@ class _OtpScreenState extends State<OtpScreen> {
         context: context,
       );
     } else if (status == -333) {
-      // new UtilityService().showMessage(
-      //   message: 'An account with this email address already exist.',
-      //   icon: Icon(
-      //     Icons.error_outline,
-      //     color: Colors.red,
-      //   ),
-      //   context: context,
-      // );
-      Navigator.of(context, rootNavigator: true).pop();
+      // Navigator.of(context, rootNavigator: true).pop();
       new UtilityService().notificationMessageWithButton(
           title: "Retry",
           message:
-              "Account already exist with this email. Please login to proceed.",
+              "Account already exist with this phone number. Please login to proceed.",
           context: context,
           backgroundColor: Colors.white,
-          color: Colors.blue,
+          color: Colors.teal,
           buttonText: "Login",
           textColor: Colors.red,
           proceed: () {
             // Navigator.of(context, rootNavigator: true).pop();
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => LoginScreen()));
-            Navigator.of(context, rootNavigator: true).pop();
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => LoginScreen(),
+              ),
+            );
           });
     } else {
-      goToHome(context, otpModel);
+      goToLogin(context, otpModel);
     }
   }
 
   void saveUserDetailsLocally(OTPModel otpModel) async {
     try {
       UserDBImplementation dbImplementation = UserDBImplementation();
-      UserDB userDB = UserDB();
+
       UserProfileModel user = UserProfileModel(
         name: otpModel.name,
         email: otpModel.email,
         phone: otpModel.phone,
         password: password,
         picture: encodedImage,
+        country: otpModel.country,
       );
-
-      await userDB.initialize();
-      await userDB.deleteAll();
 
       await dbImplementation.saveUser(user);
       setState(() {
@@ -372,12 +364,20 @@ class _OtpScreenState extends State<OtpScreen> {
     }
   }
 
-  void goToHome(BuildContext context, OTPModel otpModel) {
+  void goToLogin(BuildContext context, OTPModel otpModel) {
     saveUserDetailsLocally(otpModel);
+    new UtilityService().showMessage(
+      message: 'You have successfully created your account.',
+      icon: Icon(
+        Icons.check,
+        color: Colors.teal,
+      ),
+      context: context,
+    );
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => MyHomePage(),
+        builder: (context) => LoginScreen(),
       ),
     );
   }

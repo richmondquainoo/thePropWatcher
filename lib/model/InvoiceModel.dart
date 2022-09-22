@@ -25,6 +25,8 @@ class InvoiceModel {
   String paymentMode;
   String origin;
   String momo;
+  String requestObject;
+  String responseObject;
 
   InvoiceModel({
     this.id,
@@ -53,6 +55,8 @@ class InvoiceModel {
     this.paymentMode,
     this.origin,
     this.momo,
+    this.requestObject,
+    this.responseObject,
   });
 
   Map<String, dynamic> toMap() {
@@ -83,6 +87,8 @@ class InvoiceModel {
       'paymentMode': paymentMode,
       'origin': origin,
       'momo': momo,
+      'requestObject': requestObject,
+      'responseObject': responseObject,
     };
   }
 
@@ -115,11 +121,13 @@ class InvoiceModel {
       'paymentMode': paymentMode,
       'origin': origin,
       'momo': momo,
+      'requestObject': requestObject,
+      'responseObject': responseObject,
     };
   }
 
   @override
   String toString() {
-    return 'InvoiceModel{id: $id, invoiceNo: $invoiceNo, serviceCode: $serviceCode, serviceName: $serviceName, phone: $phone, email: $email, name: $name, status: $status, dateCreated: $dateCreated, date: $date, amount: $amount, tax: $tax, totalAmount: $totalAmount, description: $description, callbackUrl: $callbackUrl, returnUrl: $returnUrl, merchantAccountNumber: $merchantAccountNumber, cancellationUrl: $cancellationUrl, clientReference: $clientReference, paymentAmount: $paymentAmount, checkoutId: $checkoutId, checkoutUrl: $checkoutUrl, paymentDate: $paymentDate, paymentMode: $paymentMode, origin: $origin, momo: $momo}';
+    return 'InvoiceModel{id: $id, invoiceNo: $invoiceNo, serviceCode: $serviceCode, serviceName: $serviceName, phone: $phone, email: $email, name: $name, status: $status, dateCreated: $dateCreated, date: $date, amount: $amount, tax: $tax, totalAmount: $totalAmount, description: $description, callbackUrl: $callbackUrl, returnUrl: $returnUrl, merchantAccountNumber: $merchantAccountNumber, cancellationUrl: $cancellationUrl, clientReference: $clientReference, paymentAmount: $paymentAmount, checkoutId: $checkoutId, checkoutUrl: $checkoutUrl, paymentDate: $paymentDate, paymentMode: $paymentMode, origin: $origin, momo: $momo, requestObject: $requestObject, responseObject: $responseObject}';
   }
 }

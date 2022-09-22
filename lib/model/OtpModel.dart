@@ -4,8 +4,8 @@ class OTPModel {
   String email;
   String phone;
   String password;
-  int pin ;
-
+  String country;
+  int pin;
 
   OTPModel({
     this.id,
@@ -14,6 +14,7 @@ class OTPModel {
     this.pin,
     this.phone,
     this.password,
+    this.country,
   });
 
   Map<String, dynamic> toMap() {
@@ -24,6 +25,7 @@ class OTPModel {
       'pin': pin,
       'phone': phone,
       'password': password,
+      'country': country,
     };
   }
 
@@ -35,11 +37,12 @@ class OTPModel {
       'pin': pin,
       'phone': phone,
       'password': password,
+      'country': country,
     };
   }
 
   @override
   String toString() {
-    return 'OTPModel{id: $id, name: $name, email: $email, phone: $phone, password: $password, pin: $pin}';
+    return 'OTPModel{id: $id, name: $name, email: $email, phone: $phone, password: $password, country: $country, pin: $pin}';
   }
 }

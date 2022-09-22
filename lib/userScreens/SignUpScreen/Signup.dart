@@ -1,23 +1,24 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:elandguard/Component/FormDropDown.dart';
 import 'package:elandguard/Component/ProgressDialog.dart';
 import 'package:elandguard/Component/TextButtonComponent.dart';
 import 'package:elandguard/Constants/myColors.dart';
-import 'package:elandguard/Util/Constants.dart';
 import 'package:elandguard/Util/NetworkUtility.dart';
 import 'package:elandguard/Util/Utility.dart';
 import 'package:elandguard/Util/paths.dart';
 import 'package:elandguard/model/OtpModel.dart';
 import 'package:elandguard/userScreens/Login/login.dart';
 import 'package:elandguard/userScreens/OTPScreen/OtpScreen.dart';
+import 'package:elandguard/userScreens/WebViewerScreen/WebViewerScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl_phone_number_input/intl_phone_number_input.dart';
+import 'package:path/path.dart';
 
 class SignUp extends StatefulWidget {
   @override
@@ -36,10 +37,12 @@ class _SignUpState extends State<SignUp> {
   String phone;
   String password;
   String passwordConfirm;
-  String country;
+  String country = 'GH';
+  String num;
   File imageFile;
   final picker = ImagePicker();
   String base64Image;
+  bool checkboxValue = true;
 
   final scaffoldKey = new GlobalKey<ScaffoldState>();
   BuildContext context;
@@ -116,7 +119,7 @@ class _SignUpState extends State<SignUp> {
                                 source: ImageSource.gallery);
                             print('picker: ${pickedFile}');
                             if (pickedFile != null) {
-                              File croppedFile = await ImageCropper.cropImage(
+                              File croppedFile = await ImageCropper().cropImage(
                                 sourcePath: pickedFile.path,
                                 aspectRatioPresets: [
                                   CropAspectRatioPreset.square,
@@ -200,69 +203,6 @@ class _SignUpState extends State<SignUp> {
                 height: 10,
               ),
               Container(
-                margin: EdgeInsets.all(5),
-                padding: EdgeInsets.only(left: 5),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(
-                      Radius.circular(10.0)), // set rounded corner radius
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      flex: 1,
-                      child: AppDropdownInput(
-                        hintText: '',
-                        options: COUNTRY_CODE,
-                        value: country,
-                        onChanged: (String value) {
-                          setState(() {
-                            country = value;
-                          });
-                        },
-                        getLabel: (String value) => value,
-                      ),
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    Expanded(
-                      flex: 3,
-                      child: TextField(
-                        style: TextStyle(color: Colors.black87),
-                        controller: phoneController,
-                        onChanged: (value) {
-                          phone = value;
-                        },
-                        decoration: InputDecoration(
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: const BorderSide(
-                                color: Colors.black87, width: 0.0),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(10)),
-                            borderSide: const BorderSide(
-                                color: kPrimaryTheme, width: 0.7),
-                          ),
-                          prefixIcon: Icon(
-                            Icons.phone,
-                            color: Colors.black54,
-                          ),
-                          hintText: 'Phone',
-                          hintStyle:
-                              TextStyle(fontSize: 17, color: Colors.black54),
-                          border: InputBorder.none,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Container(
                 height: 48,
                 margin: EdgeInsets.all(5),
                 padding: EdgeInsets.only(left: 5),
@@ -298,6 +238,52 @@ class _SignUpState extends State<SignUp> {
                       border: InputBorder.none,
                     ),
                   ),
+                ),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Container(
+                margin: EdgeInsets.all(5),
+                padding: EdgeInsets.only(left: 5),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(
+                      Radius.circular(10.0)), // set rounded corner radius
+                ),
+                child: InternationalPhoneNumberInput(
+                  keyboardType: TextInputType.phone,
+                  hintText: 'Phone number',
+                  initialValue: PhoneNumber(dialCode: '+233', isoCode: country),
+                  textFieldController: phoneController,
+                  keyboardAction: TextInputAction.done,
+                  textStyle: TextStyle(color: Colors.black87),
+                  maxLength: 15,
+                  inputDecoration: InputDecoration(
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide:
+                          const BorderSide(color: Colors.black87, width: 0.0),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: const BorderRadius.all(Radius.circular(10)),
+                      borderSide:
+                          const BorderSide(color: kPrimaryTheme, width: 0.7),
+                    ),
+                    prefixIcon: Icon(
+                      Icons.phone,
+                      color: Colors.black54,
+                    ),
+                    hintText: 'Phone number',
+                    hintStyle: TextStyle(fontSize: 15, color: Colors.black54),
+                    border: InputBorder.none,
+                  ),
+                  spaceBetweenSelectorAndTextField: 2,
+                  onInputChanged: (PhoneNumber value) {
+                    print('phone number ${value.phoneNumber}');
+                    phone = value.phoneNumber;
+                    country = value.isoCode;
+                    num = value.phoneNumber;
+                  },
                 ),
               ),
               SizedBox(
@@ -385,6 +371,61 @@ class _SignUpState extends State<SignUp> {
                 ),
               ),
               SizedBox(
+                height: 20,
+              ),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => WebViewerScreen(
+                        title: 'Terms & Conditions',
+                        path: TERMS_URL,
+                      ),
+                    ),
+                  );
+                },
+                child: Container(
+                  child: Text(
+                    "Privacy Policy, Terms and Conditions",
+                    style: TextStyle(
+                      color: Colors.black54,
+                      fontSize: 14,
+                      wordSpacing: 0.8,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 4,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Checkbox(
+                    checkColor: Colors.white,
+                    activeColor: Colors.lightBlue,
+                    value: checkboxValue,
+                    onChanged: (bool value) {
+                      setState(() {
+                        checkboxValue = value;
+                      });
+                    },
+                  ),
+                  Container(
+                    child: Text(
+                      "I accept the Terms & Conditions",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w300,
+                      ),
+                      // overflow: TextOverflow.fade,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(
                 height: 50,
               ),
               Padding(
@@ -401,6 +442,7 @@ class _SignUpState extends State<SignUp> {
                         email: email,
                         password: password,
                         phone: phone,
+                        country: country,
                       );
                       new UtilityService().confirmationBox(
                           title: 'Confirmation',
@@ -440,7 +482,7 @@ class _SignUpState extends State<SignUp> {
                         Center(
                           child: Container(
                             child: Text(
-                              'Version 1.0.1',
+                              'Version $VERSION',
                               style: GoogleFonts.lato(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w300,
@@ -478,7 +520,19 @@ class _SignUpState extends State<SignUp> {
         ),
       );
       return false;
-    } else if (phoneController.text.length != 10) {
+    } else if (emailController.text.length == 0 ||
+        !emailController.text.contains("@") ||
+        !emailController.text.contains(".")) {
+      new UtilityService().showMessage(
+        context: context,
+        message: 'Please enter valid email',
+        icon: Icon(
+          Icons.error_outline,
+          color: Colors.red,
+        ),
+      );
+      return false;
+    } else if (phone.length == 0) {
       new UtilityService().showMessage(
         context: context,
         message: 'Please enter valid phone number',
@@ -488,12 +542,10 @@ class _SignUpState extends State<SignUp> {
         ),
       );
       return false;
-    } else if (emailController.text.length == 0 ||
-        !emailController.text.contains("@") ||
-        !emailController.text.contains(".")) {
+    } else if (country == 'GH' && phone.length != 13) {
       new UtilityService().showMessage(
         context: context,
-        message: 'Please enter valid email',
+        message: 'Please enter valid phone number',
         icon: Icon(
           Icons.error_outline,
           color: Colors.red,
@@ -521,6 +573,16 @@ class _SignUpState extends State<SignUp> {
         ),
       );
       return false;
+    } else if (!checkboxValue) {
+      new UtilityService().showMessage(
+        context: context,
+        message: 'Please accept Terms & Conditions',
+        icon: Icon(
+          Icons.error_outline,
+          color: Colors.red,
+        ),
+      );
+      return false;
     } else {
       return true;
     }
@@ -539,6 +601,7 @@ class _SignUpState extends State<SignUp> {
       Response response = await networkUtility.postDataWithAuth(
           url: OTP_URL, body: jsonBody, auth: 'Bearer $ACCESS_TOKEN');
 
+      print('Url: $url');
       print('Response: ${response.body}');
 
       Navigator.of(context, rootNavigator: true).pop();
@@ -578,6 +641,7 @@ class _SignUpState extends State<SignUp> {
             pin: data['data']['pin'],
             phone: data['data']['phone'],
             password: data['data']['password'],
+            country: country,
             // password: passwordController.text,
           );
           print('otp: $otpModel');

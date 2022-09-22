@@ -5,6 +5,7 @@ import 'dart:io';
 
 import 'package:elandguard/Component/ProgressDialog.dart';
 import 'package:elandguard/Constants/myColors.dart';
+import 'package:elandguard/Util/Constants.dart';
 import 'package:elandguard/Util/NetworkUtility.dart';
 import 'package:elandguard/Util/Utility.dart';
 import 'package:elandguard/Util/paths.dart';
@@ -18,6 +19,9 @@ import 'package:elandguard/model/UserProfileModel.dart';
 import 'package:elandguard/userScreens/Invoice/InvoiceScreen.dart';
 import 'package:elandguard/userScreens/Notifications/NotificationScreen.dart';
 import 'package:elandguard/userScreens/Payment/PaymentHistoryScreen.dart';
+import 'package:elandguard/userScreens/SitePlanLocation/ScanSiteCoordinates.dart';
+import 'package:elandguard/userScreens/TitleCertificate/TitleCertificateScreen.dart';
+import 'package:elandguard/userScreens/TrackJob/TrackJobScreen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -26,9 +30,11 @@ import 'package:http/http.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
+import 'FAQs/FAQScreen.dart';
 import 'Login/login.dart';
-import 'TrackJob/TrackJobScreen.dart';
+import 'VerifyRateableValue/VerifyRateableValue.dart';
 import 'VerifySite/VerifySiteScreen.dart';
+import 'WebViewerScreen/WebViewerScreen.dart';
 import 'aboutUs.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -83,7 +89,7 @@ class _MyHomePageState extends State<MyHomePage> {
         title: GestureDetector(
           // onLongPress: openAdmin,
           child: new Text(
-            "Property Watch",
+            "PropertyWatch",
             style: GoogleFonts.lato(),
           ),
         ),
@@ -145,364 +151,546 @@ class _MyHomePageState extends State<MyHomePage> {
               thickness: 0.5,
             ),
             SizedBox(
-              height: 3.0,
+              height: 5.0,
             ),
-            Row(children: [
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    getServiceCharge(serviceCode: 'VP', context: context);
-                  },
-                  child: Container(
-                    height: 88,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          blurRadius: 0.1,
-                          color: Colors.black38,
-                          spreadRadius: 0.1,
-                          offset: Offset(0.1, 0.3),
-                        ),
-                      ],
-                      color: Colors.white,
+            //View location of site plan
+            GestureDetector(
+              onTap: () {
+                // getServiceCharge(serviceCode: 'VP', context: context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ScanSiteCoordinates(),
+                  ),
+                );
+              },
+              child: Container(
+                height: 70,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      blurRadius: 0.1,
+                      color: Colors.black38,
+                      spreadRadius: 0.1,
+                      offset: Offset(0.1, 0.3),
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 10),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
+                  ],
+                  color: Colors.white,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 10),
+                  child: Stack(
+                    children: [
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Container(
-                            height: 30,
-                            child: Image(
-                              image:
-                                  AssetImage("assets/images/circleCheck.png"),
-                              color: Colors.teal,
-                            ),
-                          ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Container(
-                            child: Text(
-                              "Verify Plan",
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: GoogleFonts.lato(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w400,
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                flex: 1,
+                                child: Container(
+                                  height: 30,
+                                  child: Image(
+                                    image: AssetImage(
+                                        "assets/images/location-pin.png"),
+                                    color: Colors.teal,
+                                  ),
+                                ),
                               ),
-                            ),
+                              SizedBox(
+                                width: 5,
+                              ),
+                              Expanded(
+                                flex: 5,
+                                child: Container(
+                                  child: Tooltip(
+                                    message: SERVICE_1_TOOLTIP,
+                                    child: Text(
+                                      SERVICE_1,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: GoogleFonts.lato(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                    ),
+                      Padding(
+                        padding: const EdgeInsets.all(5.0),
+                        child: GestureDetector(
+                          onTap: () {
+                            new UtilityService().notificationMessageWithButton(
+                              title: SERVICE_1,
+                              message: SERVICE_1_INFO,
+                              context: context,
+                              buttonText: 'OK',
+                              color: kPrimaryTheme,
+                              proceed: () {
+                                Navigator.of(context).pop();
+                              },
+                              backgroundColor: Colors.white,
+                              textColor: Colors.black54,
+                            );
+                          },
+                          child: Align(
+                            alignment: Alignment.topRight,
+                            child: Icon(
+                              Icons.info_outline,
+                              color: kPrimaryTheme,
+                              size: 20,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-              SizedBox(
-                width: 10,
-              ),
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    getServiceCharge(serviceCode: 'VTC', context: context);
-                  },
-                  child: Container(
-                    height: 88,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          blurRadius: 0.1,
-                          color: Colors.black38,
-                          spreadRadius: 0.1,
-                          offset: Offset(0.1, 0.3),
-                        ),
-                      ],
-                      color: Colors.white,
+            ),
+            SizedBox(
+              height: 10.0,
+            ),
+            //Plot site boundaries
+            GestureDetector(
+              onTap: () {
+                // getServiceCharge(serviceCode: 'VSL', context: context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => VerifySiteScreen(),
+                  ),
+                );
+              },
+              child: Container(
+                height: 70,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      blurRadius: 0.1,
+                      color: Colors.black38,
+                      spreadRadius: 0.1,
+                      offset: Offset(0.1, 0.3),
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 10),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
+                  ],
+                  color: Colors.white,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 10),
+                  child: Stack(
+                    children: [
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Container(
-                            height: 40,
-                            child: Image(
-                              image: AssetImage("assets/images/verified.png"),
-                              color: Colors.orange,
-                            ),
-                          ),
-                          SizedBox(
-                            width: 5,
-                          ),
-                          Container(
-                            child: Text(
-                              "Verify \nTitle Certificate",
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: GoogleFonts.lato(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w400,
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Container(
+                                  height: 30,
+                                  child: Image(
+                                    image: AssetImage(
+                                        "assets/images/location-pin.png"),
+                                    color: Colors.pink,
+                                  ),
+                                ),
                               ),
-                            ),
+                              SizedBox(
+                                width: 3,
+                              ),
+                              Expanded(
+                                flex: 5,
+                                child: Container(
+                                  child: Tooltip(
+                                    message: SERVICE_2_TOOLTIP,
+                                    child: Text(
+                                      SERVICE_2,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: GoogleFonts.lato(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                    ),
+                      Padding(
+                        padding: const EdgeInsets.all(5.0),
+                        child: GestureDetector(
+                          onTap: () {
+                            new UtilityService().notificationMessageWithButton(
+                              title: SERVICE_2,
+                              message: SERVICE_2_INFO,
+                              context: context,
+                              buttonText: 'OK',
+                              color: kPrimaryTheme,
+                              proceed: () {
+                                Navigator.of(context).pop();
+                              },
+                              backgroundColor: Colors.white,
+                              textColor: Colors.black54,
+                            );
+                          },
+                          child: Align(
+                            alignment: Alignment.topRight,
+                            child: Icon(
+                              Icons.info_outline,
+                              color: kPrimaryTheme,
+                              size: 20,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-            ]),
+            ),
             SizedBox(
               height: 10,
             ),
-            Row(children: [
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    getServiceCharge(serviceCode: 'VRV', context: context);
-                  },
-                  child: Container(
-                    height: 88,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          blurRadius: 0.1,
-                          color: Colors.black38,
-                          spreadRadius: 0.1,
-                          offset: Offset(0.1, 0.3),
-                        ),
-                      ],
-                      color: Colors.white,
+
+            //Verify rateable value
+            GestureDetector(
+              onTap: () {
+                // getServiceCharge(serviceCode: 'VSL', context: context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => VerifyRateableValue(),
+                  ),
+                );
+              },
+              child: Container(
+                height: 70,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      blurRadius: 0.1,
+                      color: Colors.black38,
+                      spreadRadius: 0.1,
+                      offset: Offset(0.1, 0.3),
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 10),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
+                  ],
+                  color: Colors.white,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 10),
+                  child: Stack(
+                    children: [
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Container(
-                            height: 30,
-                            child: Image(
-                              image: AssetImage("assets/images/verify.png"),
-                              color: Colors.lightBlue,
-                            ),
-                          ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Container(
-                            child: Text(
-                              "Verify Rateable\nValues",
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: GoogleFonts.lato(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w400,
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Container(
+                                  height: 25,
+                                  child: Image(
+                                    image: AssetImage(
+                                        "assets/images/circleCheck.png"),
+                                    color: Colors.lightBlue,
+                                  ),
+                                ),
                               ),
-                            ),
+                              SizedBox(
+                                width: 3,
+                              ),
+                              Expanded(
+                                flex: 5,
+                                child: Container(
+                                  child: Tooltip(
+                                    message: SERVICE_3_TOOLTIP,
+                                    child: Text(
+                                      SERVICE_3,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: GoogleFonts.lato(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 10,
-              ),
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => TrackJobScreen(),
-                      ),
-                    );
-                  },
-                  child: Container(
-                    height: 88,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          blurRadius: 0.1,
-                          color: Colors.black38,
-                          spreadRadius: 0.1,
-                          offset: Offset(0.1, 0.3),
+                      Padding(
+                        padding: const EdgeInsets.all(5.0),
+                        child: GestureDetector(
+                          onTap: () {
+                            new UtilityService().notificationMessageWithButton(
+                              title: SERVICE_3,
+                              message: SERVICE_3_INFO,
+                              context: context,
+                              buttonText: 'OK',
+                              color: kPrimaryTheme,
+                              proceed: () {
+                                Navigator.of(context).pop();
+                              },
+                              backgroundColor: Colors.white,
+                              textColor: Colors.black54,
+                            );
+                          },
+                          child: Align(
+                            alignment: Alignment.topRight,
+                            child: Icon(
+                              Icons.info_outline,
+                              color: kPrimaryTheme,
+                              size: 20,
+                            ),
+                          ),
                         ),
-                      ],
-                      color: Colors.white,
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 15),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Container(
-                            height: 30,
-                            child: Image(
-                              image: AssetImage("assets/images/add.png"),
-                              color: Colors.deepOrange,
-                            ),
-                          ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Container(
-                            child: Text(
-                              "Track Job",
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: GoogleFonts.lato(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                          ),
-                        ],
                       ),
-                    ),
+                    ],
                   ),
                 ),
               ),
-            ]),
+            ),
             SizedBox(
               height: 10,
             ),
-            Row(children: [
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    // new UtilityService().showMessage(
-                    //   context: context,
-                    //   message: 'Service unavailable at the moment.',
-                    //   icon: Icon(
-                    //     Icons.error_outline,
-                    //     color: Colors.red,
-                    //   ),
-                    // );
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => VerifySiteScreen(),
-                      ),
-                    );
-                  },
-                  child: Container(
-                    height: 88,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          blurRadius: 0.1,
-                          color: Colors.black38,
-                          spreadRadius: 0.1,
-                          offset: Offset(0.1, 0.3),
-                        ),
-                      ],
-                      color: Colors.white,
+            //Verify title certificate
+            GestureDetector(
+              onTap: () {
+                // getServiceCharge(serviceCode: 'VSL', context: context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => TitleCertificateScreen(),
+                  ),
+                );
+              },
+              child: Container(
+                height: 70,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      blurRadius: 0.1,
+                      color: Colors.black38,
+                      spreadRadius: 0.1,
+                      offset: Offset(0.1, 0.3),
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 10),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
+                  ],
+                  color: Colors.white,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 10),
+                  child: Stack(
+                    children: [
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Container(
-                            height: 30,
-                            child: Image(
-                              image:
-                                  AssetImage("assets/images/location-pin.png"),
-                              color: Colors.pink,
-                            ),
-                          ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Container(
-                            child: Text(
-                              "Verify Location",
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: GoogleFonts.lato(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w400,
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Container(
+                                  height: 40,
+                                  child: Image(
+                                    image: AssetImage(
+                                        "assets/images/verified.png"),
+                                    color: Colors.cyan,
+                                  ),
+                                ),
                               ),
-                            ),
+                              SizedBox(
+                                width: 3,
+                              ),
+                              Expanded(
+                                flex: 5,
+                                child: Container(
+                                  child: Tooltip(
+                                    message: SERVICE_4_TOOLTIP,
+                                    child: Text(
+                                      SERVICE_4,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: GoogleFonts.lato(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 10,
-              ),
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    new UtilityService().showMessage(
-                      context: context,
-                      message: 'Service unavailable at the moment.',
-                      icon: Icon(
-                        Icons.error_outline,
-                        color: Colors.red,
-                      ),
-                    );
-                  },
-                  child: Container(
-                    height: 88,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          blurRadius: 0.1,
-                          color: Colors.black38,
-                          spreadRadius: 0.1,
-                          offset: Offset(0.1, 0.3),
+                      Padding(
+                        padding: const EdgeInsets.all(5.0),
+                        child: GestureDetector(
+                          onTap: () {
+                            new UtilityService().notificationMessageWithButton(
+                              title: SERVICE_4,
+                              message: SERVICE_4_INFO,
+                              context: context,
+                              buttonText: 'OK',
+                              color: kPrimaryTheme,
+                              proceed: () {
+                                Navigator.of(context).pop();
+                              },
+                              backgroundColor: Colors.white,
+                              textColor: Colors.black54,
+                            );
+                          },
+                          child: Align(
+                            alignment: Alignment.topRight,
+                            child: Icon(
+                              Icons.info_outline,
+                              color: kPrimaryTheme,
+                              size: 20,
+                            ),
+                          ),
                         ),
-                      ],
-                      color: Colors.white,
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 10),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Container(
-                            height: 30,
-                            child: Image(
-                              image: AssetImage("assets/images/search.png"),
-                              color: Colors.deepPurple,
-                            ),
-                          ),
-                          SizedBox(
-                            width: 5,
-                          ),
-                          Container(
-                            child: Text(
-                              "Verify Search",
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: GoogleFonts.lato(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                          ),
-                        ],
                       ),
-                    ),
+                    ],
                   ),
                 ),
               ),
-            ]),
+            ),
             SizedBox(
               height: 10,
+            ),
+            //Track Job
+            GestureDetector(
+              onTap: () {
+                // getServiceCharge(serviceCode: 'VSL', context: context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => TrackJobScreen(),
+                  ),
+                );
+              },
+              child: Container(
+                height: 70,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      blurRadius: 0.1,
+                      color: Colors.black38,
+                      spreadRadius: 0.1,
+                      offset: Offset(0.1, 0.3),
+                    ),
+                  ],
+                  color: Colors.white,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 10),
+                  child: Stack(
+                    children: [
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Container(
+                                  height: 25,
+                                  child: Image(
+                                    image:
+                                        AssetImage("assets/images/search.png"),
+                                    color: Colors.deepOrangeAccent,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                width: 3,
+                              ),
+                              Expanded(
+                                flex: 5,
+                                child: Container(
+                                  child: Tooltip(
+                                    message: SERVICE_5_TOOLTIP,
+                                    child: Text(
+                                      SERVICE_5,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: GoogleFonts.lato(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(5.0),
+                        child: GestureDetector(
+                          onTap: () {
+                            new UtilityService().notificationMessageWithButton(
+                              title: SERVICE_5,
+                              message: SERVICE_5_INFO,
+                              context: context,
+                              buttonText: 'OK',
+                              color: kPrimaryTheme,
+                              proceed: () {
+                                Navigator.of(context).pop();
+                              },
+                              backgroundColor: Colors.white,
+                              textColor: Colors.black54,
+                            );
+                          },
+                          child: Align(
+                            alignment: Alignment.topRight,
+                            child: Icon(
+                              Icons.info_outline,
+                              color: kPrimaryTheme,
+                              size: 20,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 10,
+            ),
+
+            SizedBox(
+              height: 10,
+            ),
+            Divider(
+              color: Colors.black38,
+            ),
+            Text(
+              "Misc",
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: GoogleFonts.lato(
+                fontSize: 12,
+                fontWeight: FontWeight.w300,
+                // decoration: TextDecoration.underline,
+              ),
             ),
             Divider(
               color: Colors.black38,
@@ -689,93 +877,93 @@ class _MyHomePageState extends State<MyHomePage> {
             SizedBox(
               height: 10,
             ),
-            Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          blurRadius: 0.1,
-                          color: Colors.black38,
-                          spreadRadius: 0.1,
-                          offset: Offset(0.1, 0.3),
-                        ),
-                      ],
-                      color: Colors.white,
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            flex: 1,
-                            child: CircleAvatar(
-                              backgroundColor: Colors.orange,
-                              child: Icon(
-                                Icons.history_outlined,
-                                size: 25,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Expanded(
-                            flex: 3,
-                            child: Text(
-                              "My Recent Transactions",
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: GoogleFonts.lato(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Expanded(
-                            child: Text(
-                              '${(Provider.of<AppData>(context, listen: false).paymentHistory)}',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: GoogleFonts.lato(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () {
-                                getPaymentHistory(
-                                    email: user.email, context: context);
-                              },
-                              child: Text(
-                                "View",
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: GoogleFonts.montserrat(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+            // Row(
+            //   children: [
+            //     Expanded(
+            //       child: Container(
+            //         decoration: BoxDecoration(
+            //           borderRadius: BorderRadius.circular(12),
+            //           boxShadow: [
+            //             BoxShadow(
+            //               blurRadius: 0.1,
+            //               color: Colors.black38,
+            //               spreadRadius: 0.1,
+            //               offset: Offset(0.1, 0.3),
+            //             ),
+            //           ],
+            //           color: Colors.white,
+            //         ),
+            //         child: Padding(
+            //           padding: const EdgeInsets.all(8.0),
+            //           child: Row(
+            //             children: [
+            //               Expanded(
+            //                 flex: 1,
+            //                 child: CircleAvatar(
+            //                   backgroundColor: Colors.orange,
+            //                   child: Icon(
+            //                     Icons.history_outlined,
+            //                     size: 25,
+            //                     color: Colors.white,
+            //                   ),
+            //                 ),
+            //               ),
+            //               SizedBox(
+            //                 width: 10,
+            //               ),
+            //               Expanded(
+            //                 flex: 3,
+            //                 child: Text(
+            //                   "My Recent Transactions",
+            //                   maxLines: 1,
+            //                   overflow: TextOverflow.ellipsis,
+            //                   style: GoogleFonts.lato(
+            //                     fontSize: 12,
+            //                     fontWeight: FontWeight.w400,
+            //                   ),
+            //                 ),
+            //               ),
+            //               SizedBox(
+            //                 width: 10,
+            //               ),
+            //               Expanded(
+            //                 child: Text(
+            //                   '${(Provider.of<AppData>(context, listen: false).paymentHistory)}',
+            //                   maxLines: 1,
+            //                   overflow: TextOverflow.ellipsis,
+            //                   style: GoogleFonts.lato(
+            //                     fontSize: 15,
+            //                     fontWeight: FontWeight.w500,
+            //                   ),
+            //                 ),
+            //               ),
+            //               SizedBox(
+            //                 width: 10,
+            //               ),
+            //               Expanded(
+            //                 child: GestureDetector(
+            //                   onTap: () {
+            //                     getPaymentHistory(
+            //                         email: user.email, context: context);
+            //                   },
+            //                   child: Text(
+            //                     "View",
+            //                     maxLines: 1,
+            //                     overflow: TextOverflow.ellipsis,
+            //                     style: GoogleFonts.montserrat(
+            //                       fontSize: 13,
+            //                       fontWeight: FontWeight.w500,
+            //                     ),
+            //                   ),
+            //                 ),
+            //               ),
+            //             ],
+            //           ),
+            //         ),
+            //       ),
+            //     ),
+            //   ],
+            // ),
             SizedBox(
               height: 30,
             ),
@@ -885,61 +1073,6 @@ class _MyHomePageState extends State<MyHomePage> {
                         );
                       },
                     ),
-                    new Divider(
-                      indent: 10,
-                      endIndent: 10,
-                      color: Colors.black38,
-                    ),
-                    // new ListTile(
-                    //   leading: new CircleAvatar(
-                    //     radius: 19,
-                    //     backgroundColor: Colors.blueGrey,
-                    //     child: new Icon(
-                    //       Icons.settings,
-                    //       color: Colors.white,
-                    //       size: 20.0,
-                    //     ),
-                    //   ),
-                    //   title: new Text("Settings"),
-                    //   onTap: () {
-                    //     Navigator.of(context).push(new CupertinoPageRoute(
-                    //         builder: (BuildContext context) =>
-                    //             new ProfileSettingsScreen()));
-                    //   },
-                    // ),
-                    // new ListTile(
-                    //   leading: new CircleAvatar(
-                    //     radius: 19,
-                    //     backgroundColor: Colors.deepOrange,
-                    //     child: new Icon(
-                    //       Icons.home,
-                    //       color: Colors.white,
-                    //       size: 20.0,
-                    //     ),
-                    //   ),
-                    //   title: new Text("Delivery Address"),
-                    //   onTap: () {
-                    //     Navigator.of(context).push(new CupertinoPageRoute(
-                    //         builder: (BuildContext context) =>
-                    //             new GirliesDelivery()));
-                    //   },
-                    // ),
-                    // new ListTile(
-                    //   leading: new CircleAvatar(
-                    //     radius: 19,
-                    //     backgroundColor: Colors.amber,
-                    //     child: new Icon(
-                    //       Icons.payment_rounded,
-                    //       color: Colors.white,
-                    //       size: 20.0,
-                    //     ),
-                    //   ),
-                    //   title: new Text("Payment"),
-                    //   onTap: () {
-                    //     Navigator.of(context).push(new CupertinoPageRoute(
-                    //         builder: (BuildContext context) => Payment()));
-                    //   },
-                    // ),
 
                     new ListTile(
                       leading: new CircleAvatar(
@@ -956,6 +1089,75 @@ class _MyHomePageState extends State<MyHomePage> {
                         Navigator.of(context).push(new CupertinoPageRoute(
                             builder: (BuildContext context) =>
                                 new GirliesAboutUs()));
+                      },
+                      //
+                    ),
+                    new ListTile(
+                      leading: new CircleAvatar(
+                        radius: 19,
+                        backgroundColor: Colors.orange,
+                        child: new Icon(
+                          Icons.policy,
+                          color: Colors.white,
+                          size: 20.0,
+                        ),
+                      ),
+                      title: new Text("Terms & Conditions"),
+                      onTap: () {
+                        Navigator.of(context).push(
+                          new CupertinoPageRoute(
+                            builder: (BuildContext context) =>
+                                new WebViewerScreen(
+                              title: 'Terms & Conditions',
+                              path: TERMS_URL,
+                            ),
+                          ),
+                        );
+                      },
+                      //
+                    ),
+                    new ListTile(
+                      leading: new CircleAvatar(
+                        radius: 19,
+                        backgroundColor: Colors.cyan,
+                        child: new Icon(
+                          Icons.policy,
+                          color: Colors.white,
+                          size: 20.0,
+                        ),
+                      ),
+                      title: new Text("Privacy Policy"),
+                      onTap: () {
+                        Navigator.of(context).push(
+                          new CupertinoPageRoute(
+                            builder: (BuildContext context) =>
+                                new WebViewerScreen(
+                              title: 'Privacy Policy',
+                              path: PRIVACY_URL,
+                            ),
+                          ),
+                        );
+                      },
+                      //
+                    ),
+                    new ListTile(
+                      leading: new CircleAvatar(
+                        radius: 19,
+                        backgroundColor: Colors.lightBlue,
+                        child: new Icon(
+                          Icons.help_outline,
+                          color: Colors.white,
+                          size: 20.0,
+                        ),
+                      ),
+                      title: new Text("FAQs"),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => FAQScreen(),
+                          ),
+                        );
                       },
                       //
                     ),
@@ -981,8 +1183,8 @@ class _MyHomePageState extends State<MyHomePage> {
                             message: 'Are you sure you want to logout?',
                             context: context,
                             yesColor: Colors.teal,
-                            yesLabel: 'Yes, Logout',
-                            noLabel: 'No, Cancel',
+                            yesLabel: 'Logout',
+                            noLabel: 'Cancel',
                             noColor: Colors.deepOrange,
                             buttonHeight: 30,
                             buttonWidth: 100,
@@ -1108,6 +1310,7 @@ class _MyHomePageState extends State<MyHomePage> {
             serviceName: data['data']['serviceName'],
             amount: data['data']['amount'],
             tax: data['data']['tax'],
+            levy: data['data']['levy'],
           );
           Navigator.push(
             context,
@@ -1184,16 +1387,19 @@ class _MyHomePageState extends State<MyHomePage> {
               if (data['data'][i]['status'] != null ||
                   data['data'][i]['status'] != "null") {
                 InvoiceModel model = InvoiceModel(
-                    serviceCode: data['data'][i]['serviceCode'],
-                    serviceName: data['data'][i]['serviceName'],
-                    amount: data['data'][i]['amount'],
-                    tax: data['data'][i]['tax'],
-                    paymentAmount: data['data'][i]['paymentAmount'],
-                    paymentDate: data['data'][i]['paymentDate'],
-                    paymentMode: data['data'][i]['paymentMode'],
-                    clientReference: data['data'][i]['clientReference'],
-                    invoiceNo: data['data'][i]['invoiceNo'],
-                    status: data['data'][i]['status']);
+                  serviceCode: data['data'][i]['serviceCode'],
+                  serviceName: data['data'][i]['serviceName'],
+                  amount: data['data'][i]['amount'],
+                  tax: data['data'][i]['tax'],
+                  paymentAmount: data['data'][i]['paymentAmount'],
+                  paymentDate: data['data'][i]['paymentDate'],
+                  paymentMode: data['data'][i]['paymentMode'],
+                  clientReference: data['data'][i]['clientReference'],
+                  invoiceNo: data['data'][i]['invoiceNo'],
+                  status: data['data'][i]['status'],
+                  name: data['data'][i]['name'],
+                  requestObject: data['data'][i]['requestObject'],
+                );
                 paymentList.add(model);
               }
             }
@@ -1228,7 +1434,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void clearUserDB(BuildContext context) async {
     try {
-      // await dbImplementation.deleteAll();
+      await dbImplementation.deleteAll();
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) => LoginScreen(),
@@ -1337,7 +1543,7 @@ class _MyHomePageState extends State<MyHomePage> {
           Text(
             name,
             style: TextStyle(
-                fontSize: 16,
+                fontSize: 15,
                 fontFamily: 'avenir',
                 fontWeight: FontWeight.w700),
           )
